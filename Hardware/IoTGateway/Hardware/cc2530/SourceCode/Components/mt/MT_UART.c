@@ -47,6 +47,12 @@
 #include "MT_UART.h"
 #include "OSAL_Memory.h"
 
+#include "string.h"
+#include "DebugTrace.h"
+#include "ZDProfile.h"
+#include "stdlib.h"
+#include "stdio.h"
+
 
 /***************************************************************************************************
  * MACROS
@@ -63,6 +69,9 @@
 #define DATA_STATE     0x04
 #define FCS_STATE      0x05
 
+#define PROCESS_GW_UART_SUCESSS "CMDSUCCESS"
+#define PROCESS_GW_UART_WRONGTYPE "CMDWRONGTYPE"
+
 /***************************************************************************************************
  *                                         GLOBAL VARIABLES
  ***************************************************************************************************/
@@ -77,11 +86,15 @@ uint8  FSC_Token;
 mtOSALSerialData_t  *pMsg;
 uint8  tempDataLen;
 
+char * args[10];
+
 #if defined (ZAPP_P1) || defined (ZAPP_P2)
 uint16  MT_UartMaxZAppBufLen;
 bool    MT_UartZAppRxStatus;
 #endif
 
+
+//void cicmdOnOff(uint16 destAddr,,char * name,char * strCommand,char * addrType);
 
 /***************************************************************************************************
  *                                          LOCAL FUNCTIONS
@@ -105,13 +118,15 @@ void MT_UartInit ()
 
   /* UART Configuration */
   uartConfig.configured           = TRUE;
-  uartConfig.baudRate             = MT_UART_DEFAULT_BAUDRATE;
-  uartConfig.flowControl          = MT_UART_DEFAULT_OVERFLOW;
-  uartConfig.flowControlThreshold = MT_UART_DEFAULT_THRESHOLD;
+  //uartConfig.baudRate             = MT_UART_DEFAULT_BAUDRATE;
+  uartConfig.baudRate             = HAL_UART_BR_115200;
+  uartConfig.flowControl          = FALSE;
+  uartConfig.flowControlThreshold = 0;
   uartConfig.rx.maxBufSize        = MT_UART_DEFAULT_MAX_RX_BUFF;
   uartConfig.tx.maxBufSize        = MT_UART_DEFAULT_MAX_TX_BUFF;
   uartConfig.idleTimeout          = MT_UART_DEFAULT_IDLE_TIMEOUT;
   uartConfig.intEnable            = TRUE;
+  /*
 #if defined (ZTOOL_P1) || defined (ZTOOL_P2)
   uartConfig.callBackFunc         = MT_UartProcessZToolData;
 #elif defined (ZAPP_P1) || defined (ZAPP_P2)
@@ -119,7 +134,10 @@ void MT_UartInit ()
 #else
   uartConfig.callBackFunc         = NULL;
 #endif
-
+  */
+  
+  uartConfig.callBackFunc         = uartHandleCommand;
+  
   /* Start UART */
 #if defined (MT_UART_DEFAULT_PORT)
   HalUARTOpen (MT_UART_DEFAULT_PORT, &uartConfig);
@@ -151,6 +169,129 @@ void MT_UartRegisterTaskID( byte taskID )
 {
   App_TaskID = taskID;
 }
+
+void uartHandleCommand( uint8 port, uint8 event ){
+  uint8 *bufferInRx;
+  uint8 argBuffer[20];
+  int argcount = 0;
+  uint8 countArgByteInBufferRx = 0;
+  uint16 countByteInRxBuffer = Hal_UART_RxBufLen(port);
+  bufferInRx = osal_mem_alloc(countByteInRxBuffer);
+  HalUARTRead (port, bufferInRx, countByteInRxBuffer);
+  
+  afStatus_t zdpCmdStatus;
+  char test[30];
+  
+  
+  
+  //sprintf(bufferSize, "%d", countByteInRxBuffer);
+  //_itoa(countByteInRxBuffer,bufferSize,10);
+//  uint8 i;
+//  for (i=0;*bufferInRx+i!='\r';i++)
+//  {
+//    
+//    //HalUARTWrite(MT_UART_DEFAULT_PORT, tempThis, strlen(tempThis));
+//    HalUARTWrite(port, bufferInRx+i, 1);
+//    //debug_str("rx was got somethings");
+//  }
+//  for(uint8 i = 0;i<countByteInRxBuffer;i++){
+//    HalUARTWrite(port, bufferInRx+i, 1);
+//  }
+  
+  switch(event) {
+   case HAL_UART_RX_FULL:
+   case HAL_UART_RX_ABOUT_FULL:
+   case HAL_UART_RX_TIMEOUT:
+     
+    for(uint8 i = 0; i<countByteInRxBuffer; i++){
+      if(bufferInRx[i] != 0x0A) {
+       if(bufferInRx[i] == ' '){
+         argBuffer[countArgByteInBufferRx] = '\0';
+         args[argcount] = osal_mem_alloc(countArgByteInBufferRx+1);
+         strcpy(args[argcount],argBuffer);
+         argcount++;
+         countArgByteInBufferRx = 0;
+       }else{
+         argBuffer[countArgByteInBufferRx] = bufferInRx[i];
+         countArgByteInBufferRx++;
+       }
+     }
+      else {
+        
+       argBuffer[countArgByteInBufferRx] = '\0';
+       args[argcount] = osal_mem_alloc(countArgByteInBufferRx+1);
+       strcpy(args[argcount],argBuffer);
+       argcount++;
+       countArgByteInBufferRx = 0;
+        
+      
+        for(int k = 0;k < argcount;k++){
+           debug_str(args[k]);
+         }
+        
+        
+        /*IEEEREQ [REQType,DestAddr,StartIndex]
+        REQType 0 : Single
+                1 : Extend (For Topology)
+        StartIndex may not be required when REQType is Assigned to 0.     
+         */
+        if(!strcmp(args[0],"IEEEREQ")){
+          if(!strcmp(args[1],"0")){
+            zdpCmdStatus = ZDP_IEEEAddrReq( (uint16)atoi(args[2]), 0, 0, 0);
+          }else if(!strcmp(args[1],"1")){
+            ZDP_IEEEAddrReq( (uint16)atoi(args[2]), 1, (byte)atoi(args[3]), 0);
+          }else{
+            HalUARTWrite(MT_UART_DEFAULT_PORT, PROCESS_GW_UART_WRONGTYPE, strlen(PROCESS_GW_UART_WRONGTYPE));
+          }
+          //sprintf(test,"zdpCmdStatus : %d",zdpCmdStatus);
+          //debug_str(test);
+          //debug_str(PROCESS_GW_UART_SUCESSS);
+        }
+        
+        else if(!strcmp(args[0],"IDENTIFY")){
+          
+        }
+        else if(!strcmp(args[0],"IDENTIFYQ")){
+          
+        }
+        
+        
+        
+        //reset argcount
+        argcount = 0;
+        //free memory
+        for(int i = 0; i < argcount; i++){
+          osal_mem_free(args[i]);
+        }
+        
+      }
+    
+  }
+  
+  //free memory
+  osal_mem_free(bufferInRx);
+    
+   /* for(uint8 i = 0;*(bufferInRx+i)!='\n';i++){
+      HalUARTWrite(port, bufferInRx+i, 1);
+      
+      
+      
+      
+    }*/
+     
+//     if(*(bufferInRx+1)=='\r'){
+//      HalUARTWrite(port, bufferInRx+0, 1);
+//      }
+//      else{
+//        debug_str("in there");
+//      }
+   break;
+  }
+}
+
+
+
+
 
 /***************************************************************************************************
  * @fn      SPIMgr_CalcFCS

@@ -103,6 +103,11 @@
 
 #include "NLMEDE.h"
 
+#include "DebugTrace.h"
+#include "string.h"
+#include "MT_UART.h"
+#include "stdio.h"
+
 /*********************************************************************
  * MACROS
  */
@@ -348,6 +353,10 @@ void zclSampleLight_Init( byte task_id )
   // Register with the ZDO to receive Match Descriptor Responses
   ZDO_RegisterForZDOMsg(task_id, Match_Desc_rsp);
 #endif
+  
+  ZDO_RegisterForZDOMsg(task_id, Device_annce );
+  
+  ZDO_RegisterForZDOMsg(task_id, IEEE_addr_rsp );
 
 
 #if (defined HAL_BOARD_ZLIGHT) || (defined HAL_PWM)
@@ -1570,7 +1579,11 @@ static uint8 zclSampleLight_ProcessInDiscAttrsExtRspCmd( zclIncomingMsg_t *pInMs
 static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
 {
   zclEZMode_ActionData_t data;
+  char msgPrint[200];
   ZDO_MatchDescRsp_t *pMatchDescRsp;
+  ZDO_DeviceAnnce_t *pDeviceAnnce;
+  //for ieee req
+  ZDO_NwkIEEEAddrResp_t *pNwkIEEEAddrResp;
 
   // Let EZ-Mode know of the Simple Descriptor Response
   if ( pMsg->clusterID == Match_Desc_rsp )
@@ -1580,6 +1593,67 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
     zcl_EZModeAction( EZMODE_ACTION_MATCH_DESC_RSP, &data );
     osal_mem_free( pMatchDescRsp );
   }
+  else if(pMsg->clusterID == Device_annce){
+    
+    
+    pDeviceAnnce = osal_mem_alloc(sizeof(ZDO_DeviceAnnce_t));
+    ZDO_ParseDeviceAnnce(pMsg,pDeviceAnnce);
+    
+    sprintf(msgPrint, "CMD{\"CMD\":\"ANNCE\",\"IEEEADDR\":\"%x:%x:%x:%x:%x:%x:%x:%x\",\"SHORTADDR\":\"0x%x\",\"CAP\":\"0x%x\"}\r\n",pDeviceAnnce->extAddr[7],pDeviceAnnce->extAddr[6],pDeviceAnnce->extAddr[5],pDeviceAnnce->extAddr[4],pDeviceAnnce->extAddr[3],pDeviceAnnce->extAddr[2],pDeviceAnnce->extAddr[1],pDeviceAnnce->extAddr[0], pDeviceAnnce->nwkAddr,pDeviceAnnce->capabilities);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+    //char sam[10] = "CMD ANNCE IEEE:\n";
+    
+    //HalUARTWrite(MT_UART_DEFAULT_PORT, sam, strlen(sam));
+    //uint8 *chldExtAddr;
+    //chldExtAddr = osal_mem_alloc(8);
+    //ZDO_DeviceAnnce_t msg;
+    //ZDO_ParseDeviceAnnce( pMsg, &msg);
+    //memcpy(&chldExtAddr, msg.extAddr, Z_EXTADDR_LEN);
+    //debug_str("Device_annce");
+  }
+  else if(pMsg->clusterID == IEEE_addr_rsp){
+    
+    
+    
+    pNwkIEEEAddrResp = ZDO_ParseAddrRsp( pMsg );
+    if( pNwkIEEEAddrResp->status == ZDO_SUCCESS ){
+      
+      if( pNwkIEEEAddrResp->numAssocDevs == 0 ){
+        
+        sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"STATUS\":0,\"SHORTADDR\":\"0x%x\",\"Type\":0,\"IEEEADDR\":\"%x:%x:%x:%x:%x:%x:%x:%x\"}\r\n", pNwkIEEEAddrResp->nwkAddr, pNwkIEEEAddrResp->extAddr[7], pNwkIEEEAddrResp->extAddr[6], pNwkIEEEAddrResp->extAddr[5], pNwkIEEEAddrResp->extAddr[4], pNwkIEEEAddrResp->extAddr[3], pNwkIEEEAddrResp->extAddr[2], pNwkIEEEAddrResp->extAddr[1], pNwkIEEEAddrResp->extAddr[0]);
+        HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+        
+      }
+      else if( pNwkIEEEAddrResp->numAssocDevs > 0 ){
+        
+        char temp[40];
+        
+        sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"STATUS\":0,\"SHORTADDR\":\"0x%x\",\"Type\":1,\"STID\":\"0x%x\",\"NumAsso\":\"0x%x\",\"TB\":[", pNwkIEEEAddrResp->nwkAddr, pNwkIEEEAddrResp->startIndex, pNwkIEEEAddrResp->numAssocDevs);
+        
+        for(uint8 i = 0 ; i < pNwkIEEEAddrResp->numAssocDevs ; i++){
+        
+          sprintf(temp, "\"0x%x\",", pNwkIEEEAddrResp->devList[i]);
+          strcat(msgPrint,temp);
+        }
+        
+        sprintf(temp, "]}");
+        strcat(msgPrint,temp);
+        
+        HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+      
+      }
+      
+    }
+    /*
+    else{
+      
+      sprintf(msgPrint, "CMD{CMD:\"IEEEREQ\",STATUS:%d,SRCADDR:\"%x\"}\r\n", pNwkIEEEAddrResp->status, pNwkIEEEAddrResp->nwkAddr);
+      HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+      
+    }*/
+  
+  }
+  
 }
 
 /*********************************************************************

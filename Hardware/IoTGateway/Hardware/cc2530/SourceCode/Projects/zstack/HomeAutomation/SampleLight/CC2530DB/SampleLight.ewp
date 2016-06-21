@@ -305,14 +305,14 @@
           <state>SECURE=1</state>
           <state>TC_LINKKEY_JOIN</state>
           <state>NV_INIT</state>
-          <state>xNV_RESTORE</state>
+          <state>NV_RESTORE</state>
           <state>xHOLD_AUTO_START</state>
           <state>ZTOOL_P1</state>
           <state>MT_TASK</state>
           <state>MT_APP_FUNC</state>
           <state>MT_SYS_FUNC</state>
           <state>MT_ZDO_FUNC</state>
-          <state>LCD_SUPPORTED=DEBUG</state>
+          <state>xLCD_SUPPORTED=DEBUG</state>
           <state>MULTICAST_ENABLED=FALSE</state>
           <state>ZCL_READ</state>
           <state>ZCL_WRITE</state>

@@ -107,6 +107,11 @@ void MT_UartProcessZToolData ( uint8 port, uint8 taskId );
 void MT_UartProcessZAppData ( uint8 port, uint8 event );
 
 /*
+ * Process myUartHandle
+ */
+void uartHandleCommand ( uint8 port, uint8 taskId );
+
+/*
  * Calculate the check sum
  */
 extern uint8 MT_UartCalcFCS( uint8 *msg_ptr, uint8 length );
