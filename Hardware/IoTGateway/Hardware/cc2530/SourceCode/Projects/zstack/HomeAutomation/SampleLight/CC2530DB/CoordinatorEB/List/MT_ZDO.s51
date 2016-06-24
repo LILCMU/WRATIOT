@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// IAR C/C++ Compiler V9.30.1.3056 for 8051               14/Jun/2016  12:04:00
+// IAR C/C++ Compiler V9.30.1.3056 for 8051               24/Jun/2016  19:15:52
 // Copyright 2004-2015 IAR Systems AB.
 // Standalone license - IAR Embedded Workbench for 8051
 //
@@ -43,7 +43,9 @@
 //        -D MT_ZDO_FUNC -D xLCD_SUPPORTED=DEBUG -D MULTICAST_ENABLED=FALSE -D
 //        ZCL_READ -D ZCL_WRITE -D ZCL_REPORT -D ZCL_EZMODE -D ZCL_BASIC -D
 //        ZCL_IDENTIFY -D ZCL_ON_OFF -D ZCL_SCENES -D ZCL_GROUPS -D
-//        xZCL_LEVEL_CTRL -D ZCL_DIAGNOSTIC -D FEATURE_SYSTEM_STATS -lC
+//        xZCL_LEVEL_CTRL -D ZCL_DIAGNOSTIC -D FEATURE_SYSTEM_STATS -D
+//        xZDO_IEEEADDR_REQUEST -D MT_UART_DEFAULT_MAX_TX_BUFF=255 -D
+//        xHAL_PA_LNA -lC
 //        H:\WRAT\Project\IotProject\Hardware\IoTGateway\Hardware\cc2530\SourceCode\Projects\zstack\HomeAutomation\SampleLight\CC2530DB\CoordinatorEB\List
 //        -lA
 //        H:\WRAT\Project\IotProject\Hardware\IoTGateway\Hardware\cc2530\SourceCode\Projects\zstack\HomeAutomation\SampleLight\CC2530DB\CoordinatorEB\List
@@ -12343,4 +12345,4 @@ MT_ZdoSendMsgCB:
 //     7 bytes of XDATA memory
 //
 //Errors: none
-//Warnings: none
+//Warnings: 1

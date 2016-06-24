@@ -52,6 +52,7 @@
 #include "ZDProfile.h"
 #include "stdlib.h"
 #include "stdio.h"
+#include "zcl_general.h"
 
 
 /***************************************************************************************************
@@ -119,6 +120,7 @@ void MT_UartInit ()
   /* UART Configuration */
   uartConfig.configured           = TRUE;
   //uartConfig.baudRate             = MT_UART_DEFAULT_BAUDRATE;
+  //uartConfig.baudRate             = HAL_UART_BR_9600;
   uartConfig.baudRate             = HAL_UART_BR_115200;
   uartConfig.flowControl          = FALSE;
   uartConfig.flowControlThreshold = 0;
@@ -249,9 +251,38 @@ void uartHandleCommand( uint8 port, uint8 event ){
         }
         
         else if(!strcmp(args[0],"IDENTIFY")){
-          
+          afAddrType_t addr;
+            if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.endPoint = (uint8)atoi(args[1]);
+          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          zclGeneral_SendIdentify( 8, &addr,(uint16)atoi(args[4]), FALSE, 0);
         }
         else if(!strcmp(args[0],"IDENTIFYQ")){
+          afAddrType_t addr;
+            if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.endPoint = (uint8)atoi(args[1]);
+          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          zclGeneral_SendIdentifyQuery( 8, &addr,FALSE, 0);
+        }else if(!strcmp(args[0],"ACTIVEEP")){
+          zAddrType_t destAddr;
+          uint8 retValue;
+          destAddr.addrMode = Addr16Bit;
+          destAddr.addr.shortAddr = (uint16)atoi(args[1]);
+          ZDP_ActiveEPReq( &destAddr, (uint16)atoi(args[1]), 0);
+          
+          HalUARTWrite(MT_UART_DEFAULT_PORT, &retValue , 1);
           
         }
         

@@ -326,6 +326,9 @@
           <state>xZCL_LEVEL_CTRL</state>
           <state>ZCL_DIAGNOSTIC</state>
           <state>FEATURE_SYSTEM_STATS</state>
+          <state>xZDO_IEEEADDR_REQUEST</state>
+          <state>MT_UART_DEFAULT_MAX_TX_BUFF=255</state>
+          <state>xHAL_PA_LNA</state>
         </option>
         <option>
           <name>CCPreprocFile</name>

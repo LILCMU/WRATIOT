@@ -137,6 +137,8 @@
 byte zclSampleLight_TaskID;
 uint8 zclSampleLightSeqNum;
 
+void test(void);
+
 
 /*********************************************************************
  * GLOBAL FUNCTIONS
@@ -357,6 +359,8 @@ void zclSampleLight_Init( byte task_id )
   ZDO_RegisterForZDOMsg(task_id, Device_annce );
   
   ZDO_RegisterForZDOMsg(task_id, IEEE_addr_rsp );
+  
+  ZDO_RegisterForZDOMsg(task_id, Active_EP_rsp ); 
 
 
 #if (defined HAL_BOARD_ZLIGHT) || (defined HAL_PWM)
@@ -912,6 +916,14 @@ static void zclSampleLight_IdentifyCB( zclIdentify_t *pCmd )
  */
 static void zclSampleLight_IdentifyQueryRspCB(  zclIdentifyQueryRsp_t *pRsp )
 {
+  
+  char msgPrint[50];
+  sprintf(msgPrint,"CMD{\"CMD\":\"IDENTIFYQ\",\"SRCADDR\":\"0x%x\"}\r\n",pRsp->srcAddr->addr.shortAddr);
+  HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+  
+  //sprintf(msgPrint,"{\"0x%x\"}\r\n",pRsp->srcAddr->addr.shortAddr);
+  //HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+  
   (void)pRsp;
 #ifdef ZCL_EZMODE
   {
@@ -1579,11 +1591,15 @@ static uint8 zclSampleLight_ProcessInDiscAttrsExtRspCmd( zclIncomingMsg_t *pInMs
 static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
 {
   zclEZMode_ActionData_t data;
-  char msgPrint[200];
+  
+  //char msgPrint[200];
+  char *msgPrint = osal_mem_alloc(255);
+  
   ZDO_MatchDescRsp_t *pMatchDescRsp;
   ZDO_DeviceAnnce_t *pDeviceAnnce;
   //for ieee req
   ZDO_NwkIEEEAddrResp_t *pNwkIEEEAddrResp;
+  ZDO_ActiveEndpointRsp_t *pActiveEndpointRsp;
 
   // Let EZ-Mode know of the Simple Descriptor Response
   if ( pMsg->clusterID == Match_Desc_rsp )
@@ -1594,7 +1610,6 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
     osal_mem_free( pMatchDescRsp );
   }
   else if(pMsg->clusterID == Device_annce){
-    
     
     pDeviceAnnce = osal_mem_alloc(sizeof(ZDO_DeviceAnnce_t));
     ZDO_ParseDeviceAnnce(pMsg,pDeviceAnnce);
@@ -1613,8 +1628,6 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
   }
   else if(pMsg->clusterID == IEEE_addr_rsp){
     
-    
-    
     pNwkIEEEAddrResp = ZDO_ParseAddrRsp( pMsg );
     if( pNwkIEEEAddrResp->status == ZDO_SUCCESS ){
       
@@ -1626,35 +1639,60 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
       }
       else if( pNwkIEEEAddrResp->numAssocDevs > 0 ){
         
-        char temp[40];
         
-        sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"STATUS\":0,\"SHORTADDR\":\"0x%x\",\"Type\":1,\"STID\":\"0x%x\",\"NumAsso\":\"0x%x\",\"TB\":[", pNwkIEEEAddrResp->nwkAddr, pNwkIEEEAddrResp->startIndex, pNwkIEEEAddrResp->numAssocDevs);
         
         for(uint8 i = 0 ; i < pNwkIEEEAddrResp->numAssocDevs ; i++){
-        
-          sprintf(temp, "\"0x%x\",", pNwkIEEEAddrResp->devList[i]);
-          strcat(msgPrint,temp);
+          
+          //sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"STATUS\":0,\"SRTADDR\":\"0x%x\",\"Type\":1,\"STID\":\"0x%x\",\"NumAsso\":\"0x%x\",\"TB\":\"0x%x\"}\r\n", pNwkIEEEAddrResp->nwkAddr, pNwkIEEEAddrResp->startIndex, pNwkIEEEAddrResp->numAssocDevs, pNwkIEEEAddrResp->devList[i]);
+          sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"SRTADDR\":\"0x%x\",\"TB\":\"0x%x\"}\r\n",pNwkIEEEAddrResp->nwkAddr,pNwkIEEEAddrResp->devList[i]);
+          HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+          
         }
         
-        sprintf(temp, "]}");
-        strcat(msgPrint,temp);
-        
-        HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
-      
       }
-      
     }
-    /*
-    else{
-      
-      sprintf(msgPrint, "CMD{CMD:\"IEEEREQ\",STATUS:%d,SRCADDR:\"%x\"}\r\n", pNwkIEEEAddrResp->status, pNwkIEEEAddrResp->nwkAddr);
-      HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
-      
-    }*/
+  
+  }
+  else if(pMsg->clusterID == Active_EP_rsp){
+    
+    char temp[6];
+    pActiveEndpointRsp = ZDO_ParseEPListRsp(pMsg);
+    sprintf(msgPrint, "CMD{\"CMD\":\"ACTIVEEP\",\"SRTADDR\":\"0x%x\",\"EP\":[", pActiveEndpointRsp->nwkAddr);
+    
+    for(uint8 i=0; i<pActiveEndpointRsp->cnt; i++){
+      if(i!=pActiveEndpointRsp->cnt-1){
+        sprintf(temp,"\"0x%x\",", pActiveEndpointRsp->epList[i]);
+        strcat(msgPrint,temp);
+      }else{
+        sprintf(temp,"\"0x%x\"]}", pActiveEndpointRsp->epList[i]);
+        strcat(msgPrint,temp);
+      }
+    }
+    
+    //sprintf(msgPrint,"Im here !!\r\n");    
+    HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+    
+    
+    
   
   }
   
+  osal_mem_free(msgPrint);
+  
 }
+
+void test(){
+
+  for(int i =0;i<301;i++){
+    
+    char gg[] = "g";
+    HalUARTWrite(MT_UART_DEFAULT_PORT, gg, strlen(gg));
+  
+  }
+    
+
+}
+
 
 /*********************************************************************
  * @fn      zclSampleLight_EZModeCB
