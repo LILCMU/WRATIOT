@@ -277,13 +277,27 @@ void uartHandleCommand( uint8 port, uint8 event ){
           zclGeneral_SendIdentifyQuery( 8, &addr,FALSE, 0);
         }else if(!strcmp(args[0],"ACTIVEEP")){
           zAddrType_t destAddr;
-          uint8 retValue;
+          //uint8 retValue;
           destAddr.addrMode = Addr16Bit;
           destAddr.addr.shortAddr = (uint16)atoi(args[1]);
           ZDP_ActiveEPReq( &destAddr, (uint16)atoi(args[1]), 0);
-          
-          HalUARTWrite(MT_UART_DEFAULT_PORT, &retValue , 1);
-          
+          //HalUARTWrite(MT_UART_DEFAULT_PORT, &retValue , 1);
+        }else if(!strcmp(args[0],"ONOFF")){
+          afAddrType_t addr;
+          addr.endPoint = (uint8)atoi(args[1]);
+          if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.addr.shortAddr = (uint16)atoi(args[3]);  // assign the destination address
+          if(!strcmp(args[4],"1")){
+            zclGeneral_SendOnOff_CmdOn(8,&addr,FALSE,0);
+          }else{
+            zclGeneral_SendOnOff_CmdOff(8,&addr,FALSE,0);
+          }
         }
         
         
