@@ -393,6 +393,10 @@ void zclSampleLight_Init( byte task_id )
 #ifdef ZGP_AUTO_TT
   zgpTranslationTable_RegisterEP ( &zclSampleLight_SimpleDesc );
 #endif
+  
+  // Set the transmit power level
+  ZMacSetTransmitPower(TX_PWR_PLUS_19);
+  
 }
 
 /*********************************************************************
@@ -933,16 +937,24 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
 
   zclSampleLight_DstAddr.addr.shortAddr = pPtr->srcAddr.addr.shortAddr;
 
+  uint8 Logo_UserLED_On[] = {0x54,0xfe,0x04,0x00,0x0a,0x01,0x0b};
+  uint8 Logo_UserLED_Off[] = {0x54,0xfe,0x04,0x00,0x0a,0x00,0x0a};
+  uint8 Logo_SetActivePort_D1[] = {0x54,0xfe,0x04,0x00,0x07,0x08,0x0f};
+  uint8 Logo_Motor_On[] = {0x54,0xfe,0x05,0x00,0x02,0x00,0x01,0x03};
 
   // Turn on the light
   if ( cmd == COMMAND_ON )
   {
     zclSampleLight_OnOff = LIGHT_ON;
+    HalLedSet (HAL_LED_ALL, HAL_LED_MODE_ON);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_UserLED_On, 7);
   }
   // Turn off the light
   else if ( cmd == COMMAND_OFF )
   {
     zclSampleLight_OnOff = LIGHT_OFF;
+    HalLedSet (HAL_LED_ALL, HAL_LED_MODE_OFF);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_UserLED_Off, 7);
   }
   // Toggle the light
   else if ( cmd == COMMAND_TOGGLE )
