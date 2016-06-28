@@ -402,6 +402,10 @@ void zclSampleLight_Init( byte task_id )
 #ifdef ZGP_AUTO_TT
   zgpTranslationTable_RegisterEP ( &zclSampleLight_SimpleDesc );
 #endif
+  
+  
+  ZMacSetTransmitPower(TX_PWR_PLUS_19);
+  
 }
 
 /*********************************************************************
@@ -1593,7 +1597,7 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
   zclEZMode_ActionData_t data;
   
   //char msgPrint[200];
-  char *msgPrint = osal_mem_alloc(255);
+  char *msgPrint = osal_mem_alloc(128);
   
   ZDO_MatchDescRsp_t *pMatchDescRsp;
   ZDO_DeviceAnnce_t *pDeviceAnnce;
