@@ -563,7 +563,20 @@ MAC_INTERNAL_API void macRadioTurnOnPower(void)
       /* P1_0 -> EN (LNA control) */
       RFC_OBS_CTRL1 = RFC_OBS_CTRL_LNAMIX_PD_INV;
       OBSSEL0       = OBSSEL_OBS_CTRL1;
-    }  
+    }
+   /* For Hopher LIL
+    */
+#if defined(LIL_HOPHER) && defined(HAL_PA_LNA)
+    else
+    {
+      /* P1_1 -> PAEN */
+      RFC_OBS_CTRL0 = RFC_OBS_CTRL_PA_PD_INV;
+      OBSSEL1 = OBSSEL_OBS_CTRL0;
+      /* P1_2 -> EN (LNA control) */
+      RFC_OBS_CTRL1 = RFC_OBS_CTRL_LNAMIX_PD_INV;
+      OBSSEL2 = OBSSEL_OBS_CTRL1;
+    }
+#else
     else 
     {   
       /* P1_1 -> PAEN */
@@ -574,6 +587,7 @@ MAC_INTERNAL_API void macRadioTurnOnPower(void)
       RFC_OBS_CTRL1 = RFC_OBS_CTRL_LNAMIX_PD_INV;
       OBSSEL4       = OBSSEL_OBS_CTRL1;
     }
+#endif
     
     /* For any RX, change CCA settings for CC2591 compression workaround.
     * This will override LNA control if CC2591_COMPRESSION_WORKAROUND

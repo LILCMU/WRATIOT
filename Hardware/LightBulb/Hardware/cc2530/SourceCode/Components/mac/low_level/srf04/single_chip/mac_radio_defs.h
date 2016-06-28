@@ -170,7 +170,18 @@
 #define MAC_RADIO_CHANNEL_INVALID               0xFF
 #define MAC_RADIO_TX_POWER_INVALID              0xFF
 
+/*For LIL HOPHER
+ */
+#if defined(LIL_HOPHER)
+
+#define MAC_RADIO_RECEIVER_SENSITIVITY_DBM      -101 /* dBm */
+
+#else
+
 #define MAC_RADIO_RECEIVER_SENSITIVITY_DBM      -97 /* dBm */
+
+#endif
+
 #define MAC_RADIO_RECEIVER_SATURATION_DBM       10  /* dBm */
 
 /* Reduce RX power consumption current to 20mA at the cost of some sensitivity

@@ -1481,6 +1481,8 @@
           <state>xZCL_LEVEL_CTRL</state>
           <state>ZCL_DIAGNOSTIC</state>
           <state>FEATURE_SYSTEM_STATS</state>
+          <state>HAL_PA_LNA</state>
+          <state>LIL_HOPHER</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
