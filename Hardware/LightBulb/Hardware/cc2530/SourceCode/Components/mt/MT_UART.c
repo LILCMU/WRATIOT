@@ -160,10 +160,16 @@ void MT_UartRegisterTaskID( byte taskID )
 }
 
 void uartHandleCommand( uint8 port, uint8 event ){
+  
+  
+  /*
   uint8  *bufferInRx;
   uint16 countByteInRxBuffer = Hal_UART_RxBufLen(port);
   bufferInRx = osal_mem_alloc(countByteInRxBuffer);
   HalUARTRead (port, bufferInRx, countByteInRxBuffer);
+  */
+  
+  
   //sprintf(bufferSize, "%d", countByteInRxBuffer);
   //_itoa(countByteInRxBuffer,bufferSize,10);
 //  uint8 i;
@@ -178,10 +184,20 @@ void uartHandleCommand( uint8 port, uint8 event ){
 //    HalUARTWrite(port, bufferInRx+i, 1);
 //  }
   
+  
+  
   switch(event) {
    case HAL_UART_RX_FULL:
+     break;
    case HAL_UART_RX_ABOUT_FULL:
+     break;
    case HAL_UART_RX_TIMEOUT:
+     
+    uint8  *bufferInRx;
+    uint16 countByteInRxBuffer = Hal_UART_RxBufLen(port);
+    bufferInRx = osal_mem_alloc(countByteInRxBuffer);
+    HalUARTRead (port, bufferInRx, countByteInRxBuffer);
+  
     
     for(uint8 i = 0;*(bufferInRx+i)!='\n';i++){
       HalUARTWrite(port, bufferInRx+i, 1);
@@ -193,8 +209,14 @@ void uartHandleCommand( uint8 port, uint8 event ){
 //      else{
 //        debug_str("in there");
 //      }
+    osal_mem_free(bufferInRx);
+    
    break;
   }
+   
+  
+  
+  
 }
 
 /***************************************************************************************************

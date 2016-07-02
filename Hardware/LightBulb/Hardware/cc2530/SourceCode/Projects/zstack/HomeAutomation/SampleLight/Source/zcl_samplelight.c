@@ -397,7 +397,9 @@ void zclSampleLight_Init( byte task_id )
   /* Set the transmit power level
      config it if you have PA like cc2592,etc.
   */
+#if defined(HAL_PA_LNA) && defined(LIL_HOPHER)
   ZMacSetTransmitPower(TX_PWR_PLUS_19);
+#endif  
   
 }
 
@@ -941,8 +943,9 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
 
   uint8 Logo_UserLED_On[] = {0x54,0xfe,0x04,0x00,0x0a,0x01,0x0b};
   uint8 Logo_UserLED_Off[] = {0x54,0xfe,0x04,0x00,0x0a,0x00,0x0a};
-  //uint8 Logo_SetActivePort_D1[] = {0x54,0xfe,0x04,0x00,0x07,0x08,0x0f};
-  //uint8 Logo_Motor_On[] = {0x54,0xfe,0x05,0x00,0x02,0x00,0x01,0x03};
+  uint8 Logo_SetActivePort_D1[] = {0x54,0xfe,0x04,0x00,0x07,0x01,0x08};
+  uint8 Logo_Motor_On[] = {0x54,0xfe,0x05,0x00,0x02,0x00,0x01,0x03};
+  uint8 Logo_Motor_Off[] = {0x54,0xfe,0x05,0x00,0x02,0x00,0x00,0x02};
 
   // Turn on the light
   if ( cmd == COMMAND_ON )
@@ -950,6 +953,8 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
     zclSampleLight_OnOff = LIGHT_ON;
     HalLedSet (HAL_LED_ALL, HAL_LED_MODE_ON);
     HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_UserLED_On, 7);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_SetActivePort_D1, 7);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Motor_On, 8);
   }
   // Turn off the light
   else if ( cmd == COMMAND_OFF )
@@ -957,6 +962,8 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
     zclSampleLight_OnOff = LIGHT_OFF;
     HalLedSet (HAL_LED_ALL, HAL_LED_MODE_OFF);
     HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_UserLED_Off, 7);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_SetActivePort_D1, 7);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Motor_Off, 8);
   }
   // Toggle the light
   else if ( cmd == COMMAND_TOGGLE )

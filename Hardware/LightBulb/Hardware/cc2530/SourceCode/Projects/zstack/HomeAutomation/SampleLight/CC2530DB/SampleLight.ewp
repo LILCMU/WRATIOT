@@ -1467,7 +1467,7 @@
           <state>MT_APP_FUNC</state>
           <state>MT_SYS_FUNC</state>
           <state>MT_ZDO_FUNC</state>
-          <state>LCD_SUPPORTED=DEBUG</state>
+          <state>xLCD_SUPPORTED=DEBUG</state>
           <state>MULTICAST_ENABLED=FALSE</state>
           <state>ZCL_READ</state>
           <state>ZCL_WRITE</state>
@@ -1481,8 +1481,9 @@
           <state>xZCL_LEVEL_CTRL</state>
           <state>ZCL_DIAGNOSTIC</state>
           <state>FEATURE_SYSTEM_STATS</state>
-          <state>HAL_PA_LNA</state>
-          <state>LIL_HOPHER</state>
+          <state>MT_UART_DEFAULT_MAX_TX_BUFF=200</state>
+          <state>xHAL_PA_LNA</state>
+          <state>xLIL_HOPHER</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
