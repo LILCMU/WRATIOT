@@ -200,10 +200,16 @@ void uartHandleCommand( uint8 port, uint8 event ){
 //    HalUARTWrite(port, bufferInRx+i, 1);
 //  }
   
+  /*
+  
   switch(event) {
    case HAL_UART_RX_FULL:
+     break;
    case HAL_UART_RX_ABOUT_FULL:
+     break;
    case HAL_UART_RX_TIMEOUT:
+  
+  */
      
     for(uint8 i = 0; i<countByteInRxBuffer; i++){
       if(bufferInRx[i] != 0x0A) {
@@ -227,9 +233,11 @@ void uartHandleCommand( uint8 port, uint8 event ){
        countArgByteInBufferRx = 0;
         
       
+       /*
         for(int k = 0;k < argcount;k++){
            debug_str(args[k]);
          }
+       */
         
         
         /*IEEEREQ [REQType,DestAddr,StartIndex]
@@ -330,8 +338,15 @@ void uartHandleCommand( uint8 port, uint8 event ){
 //      else{
 //        debug_str("in there");
 //      }
-   break;
+   
+  
+  /*
+    break;
   }
+  
+  */
+  
+  
 }
 
 

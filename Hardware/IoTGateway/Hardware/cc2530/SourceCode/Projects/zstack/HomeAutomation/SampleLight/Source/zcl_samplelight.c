@@ -403,8 +403,12 @@ void zclSampleLight_Init( byte task_id )
   zgpTranslationTable_RegisterEP ( &zclSampleLight_SimpleDesc );
 #endif
   
-  
+  /* Set the transmit power level
+     config it if you have PA like cc2592,etc.
+  */
+#if defined(HAL_PA_LNA) && defined(LIL_HOPHER)
   ZMacSetTransmitPower(TX_PWR_PLUS_19);
+#endif  
   
 }
 

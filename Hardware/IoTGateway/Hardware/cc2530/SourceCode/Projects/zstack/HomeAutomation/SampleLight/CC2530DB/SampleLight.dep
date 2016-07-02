@@ -618,7 +618,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 517 440 454 424 396 542 401 3 410 450 554 397 464 402 425 408 394 4 452 557 430 409 423</file>
+          <file> 517 440 454 424 396 542 4 3 410 450 464 402 425 408 394 452 557 409 423 430 554 401 397</file>
         </tool>
       </inputs>
     </file>
@@ -645,7 +645,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 4 452 454 497 464 408 424 574 51 440 542 3 489 430 410 2 546 557 409 423 450 425 471 573 517 554 402 401 397 582 483</file>
+          <file> 450 452 454 497 464 408 440 574 51 542 517 402 489 430 3 410 2 546 554 401 397 425 471 573 424 557 409 4 423 582 483</file>
         </tool>
       </inputs>
     </file>
@@ -672,7 +672,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 452 454 402 490 450 497 557 440 464 425 582 410 517 453 554 401 397 542 424 483 471 3 409 4 423 430 489 573</file>
+          <file> 452 454 409 490 450 497 557 424 423 464 425 582 410 517 453 3 4 440 542 483 471 554 402 401 397 430 489 573</file>
         </tool>
       </inputs>
     </file>
@@ -723,7 +723,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 454 586 483 452 484 440 491 471 574 497 464 450 474 490 365 406 381 582 402 430 414 386 66 394 410 517 489 439 542 424 557 362 476 358 554 401 397 573 566 423 373 567 508 3 409 4 425</file>
+          <file> 517 483 566 424 491 471 574 497 440 423 365 406 381 582 464 484 567 409 430 450 414 386 66 394 410 454 490 489 573 373 452 362 508 3 4 439 542 557 474 586 476 358 554 402 401 397 425</file>
         </tool>
       </inputs>
     </file>
@@ -912,7 +912,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 471 484 497 454 586 581 430 490 494 386 483 362 439 563 244 440 582 573 557 414 413 88 520 517 489 424 464 542 381 566 423 358 525 567 452 476 373 239 518 487 367 508 491 474 481 357</file>
+          <file> 573 484 497 586 581 440 439 490 386 582 557 362 494 563 244 471 483 430 454 414 413 88 520 517 489 424 464 542 381 566 423 358 525 567 452 476 373 239 518 487 367 508 491 474 481 357</file>
         </tool>
       </inputs>
     </file>
@@ -1074,7 +1074,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 450 3 396 452 454 397 4 440 424 574 394 2 402 425 464 408 406 403 393 410 542 557 409 423 430 517 554 401</file>
+          <file> 454 450 402 396 517 397 4 440 424 574 394 2 425 464 408 406 403 393 410 542 554 401 430 452 557 3 409 423</file>
         </tool>
       </inputs>
     </file>
@@ -1101,7 +1101,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 517 464 406 454 450 3 410 471 402 497 564 403 4 489 440 2 408 394 397 453 582 483 573 452 557 554 401 424 409 423 542 430 425</file>
+          <file> 517 464 406 450 454 3 410 471 409 497 564 403 4 489 452 424 423 2 408 394 397 453 582 483 573 440 557 554 402 401 542 430 425</file>
         </tool>
       </inputs>
     </file>
@@ -1128,7 +1128,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 542 423 403 430 408 440 452 464 450 424 3 394 4 517 409 425 2 401 406 410 454 557 402 554 397</file>
+          <file> 542 454 397 403 450 408 440 452 554 3 394 4 517 402 464 401 425 2 406 410 557 430 424 409 423</file>
         </tool>
       </inputs>
     </file>
@@ -1155,7 +1155,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 424 402 396 450 464 440 4 406 403 542 454 452 557 3 394 401 408 410 2 409 423 425 517 430 554 397</file>
+          <file> 402 440 396 430 450 406 403 4 542 454 452 464 394 401 408 410 2 517 554 397 425 557 424 3 409 423</file>
         </tool>
       </inputs>
     </file>
@@ -1182,7 +1182,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 423 452 424 406 454 409 408 410 450 557 3 4 440 542 402 425 403 394 517 554 401 397 464 430</file>
+          <file> 423 452 424 406 454 409 408 410 450 557 3 4 464 402 425 403 394 517 440 554 401 397 542 430</file>
         </tool>
       </inputs>
     </file>
@@ -1209,7 +1209,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 454 410 402 397 517 452 440 450 424 408 406 554 401 464 425 2 393 394 403 4 557 3 409 423 430 542</file>
+          <file> 440 454 410 402 397 517 452 450 424 408 406 554 401 425 2 393 394 403 4 557 3 409 423 464 430 542</file>
         </tool>
       </inputs>
     </file>
@@ -1236,7 +1236,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 454 396 397 3 393 450 554 464 408 403 574 401 425 440 2 394 406 410 4 542 557 402 424 452 517 409 423 430</file>
+          <file> 454 396 517 3 393 452 450 464 408 403 574 440 4 425 554 2 394 406 397 410 542 424 409 423 557 402 401 430</file>
         </tool>
       </inputs>
     </file>
@@ -1317,7 +1317,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 454 440 410 557 450 425 402 430 452 424 464 542 517 554 401 397 3 409 4 423</file>
+          <file> 454 424 410 557 423 425 440 409 430 452 464 542 517 3 4 402 450 554 401 397</file>
         </tool>
       </inputs>
     </file>
@@ -1371,7 +1371,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 454 402 2 440 450 464 425 554 401 397 542 430 424 3 409 4 423 517 452 410 557</file>
+          <file> 464 454 3 440 2 4 542 450 425 424 409 423 554 402 401 397 430 517 452 410 557</file>
         </tool>
       </inputs>
     </file>
@@ -1533,7 +1533,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 573 494 436 490 497 520 523 428 386 440 582 367 508 567 484 474 476 464 566 485 505 438 413 471 483 452 517 362 491 525 357 518 430 526 372 502 507 437 358 563 244 454 489 586 557 373 481 423 542 382 581 501 487 439 424 239</file>
+          <file> 494 436 520 483 508 490 497 523 428 386 471 484 452 517 362 491 474 476 464 440 566 485 505 438 413 582 573 367 567 525 357 518 430 526 372 502 507 437 358 563 244 454 489 586 557 373 481 423 542 382 581 501 487 439 424 239</file>
         </tool>
       </inputs>
     </file>
@@ -1665,6 +1665,10 @@
         <tool>
           <name>ICC8051</name>
           <file> 516 511 514 490 471 454 440 517 431 497 582 573 483 489 481 414 381 360 476 586 567 452 557 484 358 362 508 382 367 491 373 474 501 526 494 581 525 522 485 388 428 518 487 357</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 497 490 517 362 382 582 484 452 373 522 573 494 358 485 360 388 454 483 381 508 567 476 525 431 481 414 526 428 471 440 489 586 557 367 501 491 474 581 487 518 357</file>
         </tool>
       </inputs>
     </file>
@@ -2398,7 +2402,7 @@
         </tool>
         <tool>
           <name>BICOMP</name>
-          <file> 483 450 517 464 454 423 440 414 410 381 430 402 566 413 436 424 582 573 554 401 397 474 497 372 438 432 437 471 490 439 542 489 3 409 4 452 557 425</file>
+          <file> 471 4 464 517 454 423 414 410 430 3 566 413 436 440 489 490 424 409 450 474 497 372 438 432 437 439 542 582 483 573 381 554 402 401 397 452 557 425</file>
         </tool>
       </inputs>
     </file>
@@ -2553,170 +2557,6 @@
       </inputs>
     </file>
     <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\mac_backoff_timer.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\high_level\mac_pib.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\mac_autopend.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_DEBUG.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_TASK.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_SAPI.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_SYS.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\nwk\BindingTable.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_NWK.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_APP.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_UART.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_ZDO.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_VERSION.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_UTIL.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_AF.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\MT.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\mac_low_level.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\mac_rx.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\single_chip\mac_csp_tx.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\single_chip\mac_mcu.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\mac_rx_onoff.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\mac_sleep.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\mac_tx.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\mac_radio.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\single_chip\mac_mem.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\single_chip\mac_rffrontend.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mt\DebugTrace.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04\single_chip\mac_radio_defs.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\common\hal_drivers.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_sleep.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_startup.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_led.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_dma.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\Source\zcl_samplelight.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_key.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\common\hal_assert.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_flash.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\Source\zcl_samplelight_data.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\Source\OSAL_SampleLight.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_adc.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_lcd.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
       <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530PMP4712\hal_flash.c</name>
       <tool>ICC8051</tool>
     </forcedrebuild>
@@ -2726,10 +2566,6 @@
     </forcedrebuild>
     <forcedrebuild>
       <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530PMP4712\hal_key.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\mac\high_level\mac_cfg.c</name>
       <tool>ICC8051</tool>
     </forcedrebuild>
     <forcedrebuild>
@@ -2745,10 +2581,6 @@
       <tool>ICC8051</tool>
     </forcedrebuild>
     <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_timer.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
       <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530PMP4712\hal_lcd.c</name>
       <tool>ICC8051</tool>
     </forcedrebuild>
@@ -2757,123 +2589,11 @@
       <tool>ICC8051</tool>
     </forcedrebuild>
     <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_uart.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
       <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530PMP4712\hal_sleep.c</name>
       <tool>ICC8051</tool>
     </forcedrebuild>
     <forcedrebuild>
       <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530PMP4712\hal_uart.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\sys\ZDiags.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\osal\common\OSAL_Memory.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\osal\mcu\cc2530\OSAL_Nv.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\osal\common\OSAL_PwrMgr.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\sys\ZGlobals.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\osal\common\OSAL_Timers.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\osal\common\OSAL.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\nwk\nwk_globals.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\af\AF.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\osal\common\OSAL_Clock.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\nwk\stub_aps.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_diagnostic.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\Source\zcl_ha.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_ezmode.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo\ZDObject.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo\ZDApp.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo\ZDConfig.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo\ZDNwkMgr.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\services\saddr\saddr.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_general.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\ZMain\TI2530DB\OnBoard.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\zmac\f8w\zmac_cb.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\ZMain\TI2530DB\ZMain.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo\ZDProfile.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\zmac\f8w\zmac.c</name>
-      <tool>ICC8051</tool>
-    </forcedrebuild>
-    <forcedrebuild>
-      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo\ZDSecMgr.c</name>
       <tool>ICC8051</tool>
     </forcedrebuild>
   </configuration>
