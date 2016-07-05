@@ -346,6 +346,19 @@ void uartHandleCommand( uint8 port, uint8 event ){
   
   */
   
+  char eventFire[20];
+  switch(event) {
+   case HAL_UART_RX_FULL:
+     break;
+   case HAL_UART_RX_ABOUT_FULL:
+     break;
+   case HAL_UART_RX_TIMEOUT:
+     break;
+   default:
+     //sprintf(eventFire,"NoEvt:%d|",event);
+     //HalUARTWrite(port, eventFire, strlen(eventFire));
+     break;
+  }
   
 }
 

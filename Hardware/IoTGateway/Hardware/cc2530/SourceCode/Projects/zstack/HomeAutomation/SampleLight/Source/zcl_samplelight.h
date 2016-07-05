@@ -66,7 +66,11 @@ extern "C"
 #define SAMPLELIGHT_EZMODE_NEXTSTATE_EVT     0x0008
 #define SAMPLELIGHT_MAIN_SCREEN_EVT          0x0010
 #define SAMPLELIGHT_LEVEL_CTRL_EVT           0x0020
-#define SAMPLELIGHT_START_EZMODE_EVT         0x0040  
+#define SAMPLELIGHT_START_EZMODE_EVT         0x0040
+
+#if defined(HEARTBEAT_LED)
+  #define SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT 0x0041
+#endif
 
 // Application Display Modes
 #define LIGHT_MAINMODE      0x00

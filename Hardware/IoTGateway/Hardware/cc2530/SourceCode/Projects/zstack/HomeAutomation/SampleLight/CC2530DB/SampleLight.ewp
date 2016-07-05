@@ -328,8 +328,9 @@
           <state>FEATURE_SYSTEM_STATS</state>
           <state>xZDO_IEEEADDR_REQUEST</state>
           <state>MT_UART_DEFAULT_MAX_TX_BUFF=200</state>
-          <state>HAL_PA_LNA</state>
-          <state>LIL_HOPHER</state>
+          <state>xHAL_PA_LNA</state>
+          <state>xLIL_HOPHER</state>
+          <state>HEARTBEAT_LED</state>
         </option>
         <option>
           <name>CCPreprocFile</name>

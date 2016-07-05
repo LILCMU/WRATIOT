@@ -408,7 +408,17 @@ void zclSampleLight_Init( byte task_id )
   */
 #if defined(HAL_PA_LNA) && defined(LIL_HOPHER)
   ZMacSetTransmitPower(TX_PWR_PLUS_19);
-#endif  
+#endif
+  
+  /* HeartBeat LED For Hopher.
+     Implement OSAL Timer Interrupt (Z-Stack Timer not Hardware) for toggle led P1_0
+  */
+#if defined(HEARTBEAT_LED)
+    
+  osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT, 500 );
+  
+#endif
+  
   
 }
 
@@ -491,6 +501,17 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
 
     return ( events ^ SAMPLELIGHT_MAIN_SCREEN_EVT );
   }
+  
+#if defined(HEARTBEAT_LED)
+  if ( events & SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT )
+  {
+    
+    HalLedSet (HAL_LED_2, HAL_LED_MODE_TOGGLE);
+    osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT, 500 );
+        
+    return ( events ^ SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT );
+  }
+#endif
 
 #ifdef ZCL_EZMODE
 #if (defined HAL_BOARD_ZLIGHT)

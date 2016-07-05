@@ -10,6 +10,11 @@ from simpleDemoConfig import simpleDemoConfig
 
 MQTTclient = mqtt.Client()
 
+def is_hex(s):
+    hex_digits = set(string.hexdigits)
+    return s[0:2] == "0x" and all(c in hex_digits for c in s[2:])
+
+
 def initSerial():
     sp = serial.Serial()
     sp.port = simpleDemoConfig.ZIGBEE_RS232_NAME
@@ -38,12 +43,12 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print(msg.topic + " " + str(msg.payload))
     if msg.payload == "ON":
-        cmd = "ONOFF 255 0 38366 1"
+        cmd = "ONOFF 255 0 "+ str(int("0xa6e3",16)) +" 1"
         writeCommandToSerial(ser, cmd)
         #mock up response
         MQTTclient.publish(simpleDemoConfig.CORE_RESPONSE_FROM_GATEWAY_TO_MQTT, 'ON', 0, True)
     elif msg.payload == "OFF":
-        cmd = "ONOFF 255 0 38366 0"
+        cmd = "ONOFF 255 0 "+ str(int("0xa6e3",16)) +" 0"
         writeCommandToSerial(ser, cmd)
         #mock up response
         MQTTclient.publish(simpleDemoConfig.CORE_RESPONSE_FROM_GATEWAY_TO_MQTT, 'OFF', 0, True)
