@@ -406,7 +406,7 @@ void zclSampleLight_Init( byte task_id )
   /* Set the transmit power level
      config it if you have PA like cc2592,etc.
   */
-#if defined(HAL_PA_LNA) && defined(LIL_HOPHER)
+#if defined(HAL_PA_LNA) /* && defined(LIL_HOPHER) */
   ZMacSetTransmitPower(TX_PWR_PLUS_19);
 #endif
   
