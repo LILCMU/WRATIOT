@@ -1482,6 +1482,7 @@
           <state>ZCL_DIAGNOSTIC</state>
           <state>FEATURE_SYSTEM_STATS</state>
           <state>MT_UART_DEFAULT_MAX_TX_BUFF=200</state>
+          <state>MT_UART_DEFAULT_MAX_RX_BUFF=200</state>
           <state>HAL_PA_LNA</state>
           <state>xLIL_HOPHER</state>
         </option>

@@ -328,9 +328,10 @@
           <state>FEATURE_SYSTEM_STATS</state>
           <state>xZDO_IEEEADDR_REQUEST</state>
           <state>MT_UART_DEFAULT_MAX_TX_BUFF=200</state>
+          <state>MT_UART_DEFAULT_MAX_RX_BUFF=200</state>
           <state>xHAL_PA_LNA</state>
           <state>xLIL_HOPHER</state>
-          <state>xHEARTBEAT_LED</state>
+          <state>HEARTBEAT_LED</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -519,10 +520,7 @@
           <state>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac\f8w</state>
-          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB</state>
-          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\cc2531</state>
-          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\class_cdc</state>
-          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -4703,7 +4701,6 @@
       <group>
         <name>CC2530EB</name>
         <excluded>
-          <configuration>CoordinatorEB</configuration>
           <configuration>RouterZLight</configuration>
         </excluded>
         <group>
@@ -4767,6 +4764,7 @@
       <group>
         <name>CC2530USB</name>
         <excluded>
+          <configuration>CoordinatorEB</configuration>
           <configuration>RouterZLight</configuration>
         </excluded>
         <group>

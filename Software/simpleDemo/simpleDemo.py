@@ -5,8 +5,11 @@ import threading
 import json
 import time
 import paho.mqtt.client as mqtt
+import logging
+import struct
 
 from simpleDemoConfig import simpleDemoConfig
+from CoreSystem.byteCodeZigBee import ByteCodeZigBee
 
 MQTTclient = mqtt.Client()
 
@@ -22,7 +25,7 @@ def initSerial():
     sp.parity = serial.PARITY_NONE
     sp.bytesize = serial.EIGHTBITS
     sp.stopbits = serial.STOPBITS_ONE
-    sp.timeout = 0.5
+    sp.timeout = None
     sp.xonxoff = False
     sp.rtscts = False
     sp.dsrdtr = False
@@ -43,12 +46,12 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print(msg.topic + " " + str(msg.payload))
     if msg.payload == "ON":
-        cmd = "ONOFF 255 0 "+ str(int("0xa6e3",16)) +" 1"
+        cmd = "ONOFF 255 0 "+ str(int("35846",10)) +" 1"
         writeCommandToSerial(ser, cmd)
         #mock up response
         MQTTclient.publish(simpleDemoConfig.CORE_RESPONSE_FROM_GATEWAY_TO_MQTT, 'ON', 0, True)
     elif msg.payload == "OFF":
-        cmd = "ONOFF 255 0 "+ str(int("0xa6e3",16)) +" 0"
+        cmd = "ONOFF 255 0 "+ str(int("35846",10)) +" 0"
         writeCommandToSerial(ser, cmd)
         #mock up response
         MQTTclient.publish(simpleDemoConfig.CORE_RESPONSE_FROM_GATEWAY_TO_MQTT, 'OFF', 0, True)
@@ -65,39 +68,61 @@ def startMQTTserver():
 # the function that have duty to use data to process should get from quene
 # To prevent threading process data at the same time you should lock a quene
 
-
+cmd_Map_Table = [{"CMD":chr(1),"ByteCount":11,"Detail":"DeviceAnnc"}]
+ByteCodeInterpreter = ByteCodeZigBee(loggingLevel=logging.DEBUG)
 def readInputSerial(ser):
-    _temp = ''
+    _temp = []
+    counterPayloadByte = 0
+    valueBefore = ''
+    _cmdList = []
     while True:
-        time.sleep(0.01)
-        data_left = ser.inWaiting()
-        value = ''
-        _cmdList = []
-        #header with CMD
-        #slice with \r\n to list
-        if data_left > 0:
-            value = ser.read(data_left)
-            #print raw data before slice
-            print "Raw Incoming Serial, Lenght : " + str(len(value)) + ", Data :" + value
-            j = 0;
-            _status = False
-            for i in value:
-                if i == '\r' and value[j + 1] == '\n':
-                    _status = False
-                    _temp = _temp[3:]
-                    _cmdList.append(_temp)
-                    _temp = ''
-                if i == 'C' and value[j + 1] == 'M' and value[j + 2] == 'D' and not _status:
-                    _status = True
-                if _status:
-                    _temp += i
+        #print valueBefore
+        if counterPayloadByte > 0:
+            #print "In read payload :" + str(counterPayloadByte)
+            value = ser.read(1)
+            _temp.append(value)
+            counterPayloadByte = counterPayloadByte - 1
+            if counterPayloadByte <= 0:
+                _cmdList.append(_temp)
+                _temp = []
+        elif valueBefore == chr(0x54) and counterPayloadByte <= 0:
+            value = ser.read(1)
+            if value == chr(0xfe):
+                #print "Found Header"
+                _cmdByte1 = ser.read(1)
+                _cmdByte2 = ser.read(1)
+                _counterPayloadByte = ser.read(1)
 
-                j += 1;
-            for i in _cmdList:
-                print
-                print "CMDList Lenght : "+str(len(i))+" CMD : "+i
-            #clear _cmdList
-            _cmdList = []
+                #print str(ord(_counterPayloadByte))
+
+                _temp.append(chr(0x54))
+                _temp.append(chr(0xfe))
+                _temp.append(_cmdByte1)
+                _temp.append(_cmdByte2)
+                _temp.append(_counterPayloadByte)
+
+                counterPayloadByte = ord(_counterPayloadByte)
+            else:
+                valueBefore = value
+        else:
+            #print "Header not found"
+            #print ser.inWaiting()
+            value = ser.read(1)
+            valueBefore = value
+
+
+        for i in _cmdList:
+            '''
+            try:
+                i = json.loads(i)
+            except ValueError as e:
+                print i
+            if type(i) is dict:
+                if i.has_key('GG'):
+            '''
+            #print i
+            ByteCodeInterpreter.interpretByteCodeToPacket(i)
+        _cmdList = []
 
 
 def writeCommandToSerial(ser, cmd):

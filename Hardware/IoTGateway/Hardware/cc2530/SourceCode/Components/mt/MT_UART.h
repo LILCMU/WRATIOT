@@ -130,6 +130,11 @@ extern void MT_UartZAppBufferLengthRegister ( uint16 maxLen );
  * Turn Application flow control ON/OFF
  */
 extern void MT_UartAppFlowControl ( uint8 status );
+   
+/*
+ * 
+ */
+extern uint8 * intToByteArray ( uint16 intVal , uint8 byteLenght );
 
 /***************************************************************************************************
 ***************************************************************************************************/

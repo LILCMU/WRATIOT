@@ -173,16 +173,7 @@ void MT_UartRegisterTaskID( byte taskID )
 }
 
 void uartHandleCommand( uint8 port, uint8 event ){
-  uint8 *bufferInRx;
-  uint8 argBuffer[20];
-  int argcount = 0;
-  uint8 countArgByteInBufferRx = 0;
-  uint16 countByteInRxBuffer = Hal_UART_RxBufLen(port);
-  bufferInRx = osal_mem_alloc(countByteInRxBuffer);
-  HalUARTRead (port, bufferInRx, countByteInRxBuffer);
   
-  afStatus_t zdpCmdStatus;
-  char test[30];
   
   
   
@@ -200,7 +191,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
 //    HalUARTWrite(port, bufferInRx+i, 1);
 //  }
   
-  /*
+  
   
   switch(event) {
    case HAL_UART_RX_FULL:
@@ -208,8 +199,17 @@ void uartHandleCommand( uint8 port, uint8 event ){
    case HAL_UART_RX_ABOUT_FULL:
      break;
    case HAL_UART_RX_TIMEOUT:
-  
-  */
+     
+    uint8 *bufferInRx;
+    uint8 argBuffer[20];
+    int argcount = 0;
+    uint8 countArgByteInBufferRx = 0;
+    uint16 countByteInRxBuffer = Hal_UART_RxBufLen(port);
+    bufferInRx = osal_mem_alloc(countByteInRxBuffer);
+    HalUARTRead (port, bufferInRx, countByteInRxBuffer);
+
+    afStatus_t zdpCmdStatus;
+    char test[30];
      
     for(uint8 i = 0; i<countByteInRxBuffer; i++){
       if(bufferInRx[i] != 0x0A) {
@@ -340,12 +340,13 @@ void uartHandleCommand( uint8 port, uint8 event ){
 //      }
    
   
-  /*
+  
     break;
   }
   
-  */
   
+  
+  /*
   char eventFire[20];
   switch(event) {
    case HAL_UART_RX_FULL:
@@ -359,12 +360,28 @@ void uartHandleCommand( uint8 port, uint8 event ){
      //HalUARTWrite(port, eventFire, strlen(eventFire));
      break;
   }
+  */
   
 }
 
+/***************************************************************************************************
+ * @fn          convert int to byte array
+ * 
+ * @param       uint16 intVal - integer
+ * @param       uint8 byteLenght
+ *
+ * @return      return Byte Array pointer (Big-endian)
+ *              Don't forget to free memory by osal_mem_free()
+ ***************************************************************************************************/
 
-
-
+uint8 * intToByteArray(uint16 intVal,uint8 byteLenght){
+    uint8 *temp;
+    temp = osal_mem_alloc(byteLenght);
+    for(uint8 i = 0; i < byteLenght ; i++){
+        *(temp+((byteLenght-1)-i)) = ((intVal >> (i*8)) & 0xff);
+    }
+    return temp;
+}
 
 /***************************************************************************************************
  * @fn      SPIMgr_CalcFCS
