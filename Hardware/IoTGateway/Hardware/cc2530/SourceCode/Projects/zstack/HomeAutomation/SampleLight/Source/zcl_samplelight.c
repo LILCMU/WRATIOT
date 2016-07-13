@@ -1657,6 +1657,8 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
     //debug_str("Device_annce");
     
     
+    
+    
     uint8 *SrtAddr;
     uint8 *Cmd;
     SrtAddr = intToByteArray(pDeviceAnnce->nwkAddr,2);

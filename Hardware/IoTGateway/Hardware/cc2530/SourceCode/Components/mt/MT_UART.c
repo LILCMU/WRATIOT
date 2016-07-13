@@ -53,6 +53,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "zcl_general.h"
+#include "ZDSecMgr.h"
 
 
 /***************************************************************************************************
@@ -306,6 +307,8 @@ void uartHandleCommand( uint8 port, uint8 event ){
           }else{
             zclGeneral_SendOnOff_CmdOff(8,&addr,FALSE,0);
           }
+        }else if(!strcmp(args[0],"PERMITJOIN")){
+          ZDSecMgrPermitJoining(atoi(args[1]));
         }
         
         
