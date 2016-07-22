@@ -210,7 +210,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
     HalUARTRead (port, bufferInRx, countByteInRxBuffer);
 
     afStatus_t zdpCmdStatus;
-    char test[30];
+    //char test[30];
      
     for(uint8 i = 0; i<countByteInRxBuffer; i++){
       if(bufferInRx[i] != 0x0A) {
@@ -309,6 +309,28 @@ void uartHandleCommand( uint8 port, uint8 event ){
           }
         }else if(!strcmp(args[0],"PERMITJOIN")){
           ZDSecMgrPermitJoining(atoi(args[1]));
+        }else if(!strcmp(args[0],"READATTR")){
+          
+          afAddrType_t addr;
+          addr.endPoint = (uint8)atoi(args[1]);
+          if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          
+          
+          zclReadCmd_t readCmd;
+          readCmd.numAttr = 1;
+          readCmd.attrID[0] = (uint16)atoi(args[5]);
+          
+          
+          //args[4] is cluster id
+          
+          zcl_SendRead( 8, &addr, (uint16)atoi(args[4]), &readCmd, ZCL_FRAME_CLIENT_SERVER_DIR, FALSE, 0);
         }
         
         

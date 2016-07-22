@@ -946,9 +946,30 @@ static void zclSampleLight_IdentifyCB( zclIdentify_t *pCmd )
 static void zclSampleLight_IdentifyQueryRspCB(  zclIdentifyQueryRsp_t *pRsp )
 {
   
-  char msgPrint[50];
-  sprintf(msgPrint,"CMD{\"CMD\":\"IDENTIFYQ\",\"SRCADDR\":\"0x%x\"}\r\n",pRsp->srcAddr->addr.shortAddr);
-  HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+  char *msgPrint;
+  //you should allocate + 1 because sprintf will detach \0 in the end of string.
+  msgPrint = osal_mem_alloc( sizeof(char)*10 );
+  
+  uint8 *Cmd;
+  uint8 *SrtAddr;
+  uint8 *Timeout;
+  
+  Cmd = intToByteArray(3,2);
+  SrtAddr = intToByteArray((uint16)pRsp->srcAddr->addr.shortAddr ,2);
+  Timeout = intToByteArray((uint16)pRsp->timeout ,2);
+  
+  sprintf(msgPrint,"%c%c%c%c%c%c%c%c%c",0x54 ,0xfe ,*Cmd ,*(Cmd+1) ,4 ,*SrtAddr ,*(SrtAddr+1) ,*Timeout ,*(Timeout+1));
+  HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, 9);
+  osal_mem_free(SrtAddr);
+  osal_mem_free(Timeout);
+  osal_mem_free(Cmd);
+  
+  osal_mem_free( msgPrint );
+  
+  //sprintf(msgPrint,"CMD{\"CMD\":\"IDENTIFYQ\",\"SRCADDR\":\"0x%x\"}\r\n",pRsp->srcAddr->addr.shortAddr);
+  //HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+  
+  
   
   //sprintf(msgPrint,"{\"0x%x\"}\r\n",pRsp->srcAddr->addr.shortAddr);
   //HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
@@ -1476,16 +1497,67 @@ static void zclSampleLight_ProcessIncomingMsg( zclIncomingMsg_t *pInMsg )
  */
 static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
 {
+  char *msgPrint;
+  msgPrint = osal_mem_alloc( sizeof(char)*15 );
+  
   zclReadRspCmd_t *readRspCmd;
-  uint8 i;
-
+  //uint8 i;
   readRspCmd = (zclReadRspCmd_t *)pInMsg->attrCmd;
+  
+  //pInMsg->clusterId
+  //(uint16)ZCL_CLUSTER_ID_GEN_ON_OFF
+  
+  switch(pInMsg->clusterId)
+  {
+  case ZCL_CLUSTER_ID_GEN_ON_OFF:
+    {
+      //sprintf(gggg,"read ep:%x addr:%x clId:%x %x  attr:%x val:%x", (uint8)pInMsg->srcAddr.endPoint, pInMsg->srcAddr.addr, clusterId_resp,ZCL_CLUSTER_ID_GEN_ON_OFF, *((uint16 *) readRspCmd->attrList[0].attrID) , (uint8)*(readRspCmd->attrList[0].data)  );
+      //sprintf(gggg,"0x%x 0x%x 0x%x 0x%x 0x%x 0x%x",(uint16) pInMsg->srcAddr.addr.shortAddr , (uint8) pInMsg->srcAddr.endPoint , (uint16) pInMsg->clusterId , readRspCmd->attrList[0].attrID , readRspCmd->attrList[0].dataType , *((uint8 *) readRspCmd->attrList[0].data) );
+      //HalUARTWrite(MT_UART_DEFAULT_PORT, gggg, strlen(gggg));
+      
+      uint8 *SrtAddr;
+      uint8 *Cmd;
+      uint8 *ClusterId;
+      uint8 *AttrId;
+      SrtAddr = intToByteArray((uint16)pInMsg->srcAddr.addr.shortAddr ,2);
+      Cmd = intToByteArray(2,2);
+      ClusterId = intToByteArray((uint16)pInMsg->clusterId ,2);
+      AttrId = intToByteArray((uint16)readRspCmd->attrList[0].attrID ,2);
+      sprintf(msgPrint,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),9,*SrtAddr,*(SrtAddr+1), (uint8) pInMsg->srcAddr.endPoint , *ClusterId,*(ClusterId+1) , *AttrId,*(AttrId+1)  , readRspCmd->attrList[0].dataType , *((uint8 *) readRspCmd->attrList[0].data) );
+      HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, 14);
+      osal_mem_free(SrtAddr);
+      osal_mem_free(Cmd);
+      osal_mem_free(ClusterId);
+      osal_mem_free(AttrId);
+      
+      break;
+    }
+  default:
+    {
+      sprintf(msgPrint,"GGGG");
+      HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+      
+    }
+    
+    
+  
+  }
+  
+  /*
   for (i = 0; i < readRspCmd->numAttr; i++)
   {
+    char temp[30];
+    sprintf(temp," attr:%d val:%d", readRspCmd->attrList[i].attrID, readRspCmd->attrList[i]->data[0] );
+    strcat(gg,temp);
+    
     // Notify the originator of the results of the original read attributes
     // attempt and, for each successfull request, the value of the requested
     // attribute
   }
+  */
+
+  osal_mem_free( msgPrint );
+  
 
   return ( TRUE );
 }

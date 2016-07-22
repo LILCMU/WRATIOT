@@ -28,6 +28,24 @@ class ByteCodeZigBee:
                 packet_temp['IEEE_ADDR'] = IEEE_ADDR
                 packet_temp['SHORT_ADDR'] = struct.unpack('>I', SRT_ADDR)[0]
                 packet_temp['CAP'] = struct.unpack('>I', CAP)[0]
+            elif cmd_pack == 2:
+                packet_temp['CMD'] = 2
+                packet_temp['SRC_ADDR'] = struct.unpack('>I', bytearray([ 0, 0, ord( bc[5] ), ord( bc[6] ) ] ) )[0]
+                packet_temp['EP'] = ord( bc[7] )
+                packet_temp['CLUSTER_ID'] = struct.unpack('>I', bytearray([ 0, 0, ord( bc[8] ), ord( bc[9] ) ] ) )[0]
+                packet_temp['ATTR_ID'] = struct.unpack('>I', bytearray([0, 0, ord(bc[10]), ord(bc[11])]) )[0]
+                packet_temp['DATA_TYPE'] = ord(bc[12])
+                #check Data type
+                if packet_temp['DATA_TYPE'] == 0x10:
+                    #ZCL_DATATYPE_BOOLEAN
+                    packet_temp['DATA'] = ord(bc[13])
+
+                else:
+                    self.ByteCodeZigBee_logging.debug("NO DATA MATCHING")
+            elif cmd_pack == 3:
+                packet_temp['CMD'] = 3
+                packet_temp['SRC_ADDR'] = struct.unpack('>I', bytearray([0, 0, ord(bc[5]), ord(bc[6])]))[0]
+                packet_temp['TIMEOUT'] = struct.unpack('>I', bytearray([0, 0, ord(bc[7]), ord(bc[8])]))[0]
 
         else:
             self.ByteCodeZigBee_logging.debug("BAD HEADER")

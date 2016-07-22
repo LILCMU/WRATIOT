@@ -4068,6 +4068,15 @@
     </group>
   </group>
   <group>
+    <name>LogoChip</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LogoChipCommunication.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LogoChipCommunication.h</name>
+    </file>
+  </group>
+  <group>
     <name>MAC</name>
     <group>
       <name>High Level</name>

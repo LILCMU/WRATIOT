@@ -74,6 +74,7 @@ def readInputSerial(ser):
     _temp = []
     counterPayloadByte = 0
     valueBefore = ''
+    #_cmdList use to contain complete packet
     _cmdList = []
     while True:
         #print valueBefore
