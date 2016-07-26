@@ -89,7 +89,7 @@ def readInputSerial(ser):
         elif valueBefore == chr(0x54) and counterPayloadByte <= 0:
             value = ser.read(1)
             if value == chr(0xfe):
-                #print "Found Header"
+                print "Found Header"
                 _cmdByte1 = ser.read(1)
                 _cmdByte2 = ser.read(1)
                 _counterPayloadByte = ser.read(1)

@@ -1497,8 +1497,7 @@ static void zclSampleLight_ProcessIncomingMsg( zclIncomingMsg_t *pInMsg )
  */
 static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
 {
-  char *msgPrint;
-  msgPrint = osal_mem_alloc( sizeof(char)*15 );
+  
   
   zclReadRspCmd_t *readRspCmd;
   //uint8 i;
@@ -1514,6 +1513,13 @@ static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
       //sprintf(gggg,"read ep:%x addr:%x clId:%x %x  attr:%x val:%x", (uint8)pInMsg->srcAddr.endPoint, pInMsg->srcAddr.addr, clusterId_resp,ZCL_CLUSTER_ID_GEN_ON_OFF, *((uint16 *) readRspCmd->attrList[0].attrID) , (uint8)*(readRspCmd->attrList[0].data)  );
       //sprintf(gggg,"0x%x 0x%x 0x%x 0x%x 0x%x 0x%x",(uint16) pInMsg->srcAddr.addr.shortAddr , (uint8) pInMsg->srcAddr.endPoint , (uint16) pInMsg->clusterId , readRspCmd->attrList[0].attrID , readRspCmd->attrList[0].dataType , *((uint8 *) readRspCmd->attrList[0].data) );
       //HalUARTWrite(MT_UART_DEFAULT_PORT, gggg, strlen(gggg));
+      char *msgPrint;
+      msgPrint = osal_mem_alloc( sizeof(char)*15 );
+      
+      //char a[20];
+      //sprintf(a,"add:%x",pInMsg->srcAddr.addr.shortAddr);
+      //debug_str(a);
+      
       
       uint8 *SrtAddr;
       uint8 *Cmd;
@@ -1529,13 +1535,17 @@ static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
       osal_mem_free(Cmd);
       osal_mem_free(ClusterId);
       osal_mem_free(AttrId);
+      osal_mem_free( msgPrint );
       
       break;
     }
   default:
     {
+      char *msgPrint;
+      msgPrint = osal_mem_alloc( sizeof(char)*15 );
       sprintf(msgPrint,"GGGG");
       HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+      osal_mem_free( msgPrint );
       
     }
     
@@ -1556,7 +1566,7 @@ static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
   }
   */
 
-  osal_mem_free( msgPrint );
+  
   
 
   return ( TRUE );
@@ -1740,6 +1750,7 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
     osal_mem_free(SrtAddr);
     osal_mem_free(Cmd);
     
+    AddDeviceToCacheDeviceTable( pDeviceAnnce->nwkAddr );
     
     osal_mem_free( pDeviceAnnce );
     osal_mem_free(msgPrint);
@@ -1781,10 +1792,34 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
   else if(pMsg->clusterID == Active_EP_rsp){
     
     ZDO_ActiveEndpointRsp_t *pActiveEndpointRsp;
+    pActiveEndpointRsp = ZDO_ParseEPListRsp(pMsg);
+    
+    uint8 packet_Size = 5+2+1+pActiveEndpointRsp->cnt;
+    
+    char *msgStr = osal_mem_alloc(packet_Size+1);
+    char *temp = osal_mem_alloc(2);
+    uint8 *SrtAddr = intToByteArray(pActiveEndpointRsp->nwkAddr,2);
+    
+    sprintf(msgStr,"%c%c%c%c%c%c%c%c",0x54,0xfe,0x00,0x06,2+1+pActiveEndpointRsp->cnt,*SrtAddr,*(SrtAddr+1),pActiveEndpointRsp->cnt);
+    for(uint8 i=0; i<pActiveEndpointRsp->cnt; i++){
+    
+      sprintf(temp,"%c", pActiveEndpointRsp->epList[i]);
+      memcpy(msgStr+8+i,temp,1);
+      
+    }
+    
+    
+    /*
+    
+    
     char *msgPrint = osal_mem_alloc(128);
     
     char temp[6];
-    pActiveEndpointRsp = ZDO_ParseEPListRsp(pMsg);
+    
+    
+    
+    
+    
     sprintf(msgPrint, "CMD{\"CMD\":\"ACTIVEEP\",\"SRTADDR\":\"0x%x\",\"EP\":[", pActiveEndpointRsp->nwkAddr);
     
     for(uint8 i=0; i<pActiveEndpointRsp->cnt; i++){
@@ -1797,12 +1832,17 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
       }
     }
     
-    //sprintf(msgPrint,"Im here !!\r\n");    
-    HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+    //sprintf(msgPrint,"Im here !!\r\n"); 
+    
+    */
+    
+    HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, packet_Size);
     
     
     osal_mem_free( pActiveEndpointRsp );
-    osal_mem_free(msgPrint);
+    osal_mem_free(msgStr);
+    osal_mem_free(temp);
+    osal_mem_free(SrtAddr);
   
   }
   

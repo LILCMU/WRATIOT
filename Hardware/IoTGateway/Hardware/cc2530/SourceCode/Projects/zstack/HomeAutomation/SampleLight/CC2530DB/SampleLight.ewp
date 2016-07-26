@@ -329,9 +329,9 @@
           <state>xZDO_IEEEADDR_REQUEST</state>
           <state>MT_UART_DEFAULT_MAX_TX_BUFF=200</state>
           <state>MT_UART_DEFAULT_MAX_RX_BUFF=200</state>
-          <state>xHAL_PA_LNA</state>
+          <state>HAL_PA_LNA</state>
           <state>xLIL_HOPHER</state>
-          <state>HEARTBEAT_LED</state>
+          <state>xHEARTBEAT_LED</state>
         </option>
         <option>
           <name>CCPreprocFile</name>

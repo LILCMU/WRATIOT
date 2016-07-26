@@ -46,6 +46,28 @@ class ByteCodeZigBee:
                 packet_temp['CMD'] = 3
                 packet_temp['SRC_ADDR'] = struct.unpack('>I', bytearray([0, 0, ord(bc[5]), ord(bc[6])]))[0]
                 packet_temp['TIMEOUT'] = struct.unpack('>I', bytearray([0, 0, ord(bc[7]), ord(bc[8])]))[0]
+            elif cmd_pack == 4:
+                CacheDeviceAmount = ( ord(bc[4]) - 4 ) / 2
+                packet_temp['CMD'] = 4
+                packet_temp['CacheDeviceInPacket'] = CacheDeviceAmount
+                packet_temp['StartIndex'] = struct.unpack('>I', bytearray([0, 0, ord(bc[7]), ord(bc[8])]))[0]
+                packet_temp['CacheDeviceAmount'] = struct.unpack('>I', bytearray([0, 0, ord(bc[5]), ord(bc[6])]))[0]
+                CacheDeviceTbList = []
+                for i in range(0,packet_temp['CacheDeviceInPacket']):
+                    CacheDeviceTbList.append(struct.unpack('>I', bytearray([0, 0, ord(bc[9+(i*2)]), ord(bc[10+(i*2)])]))[0])
+                packet_temp['CacheDeviceTable'] = CacheDeviceTbList
+            elif cmd_pack == 5:
+                packet_temp['CMD'] = 5
+                packet_temp['STATUS'] = ord(bc[5])
+            elif cmd_pack == 6:
+                packet_temp['CMD'] = 6
+                ActiveEPCount = ord(bc[7])
+                ActiveEPList = []
+                for i in range(0,ActiveEPCount):
+                    ActiveEPList.append(ord(bc[8+i]))
+                packet_temp['ACTIVEEPLIST'] = ActiveEPList
+                packet_temp['ACTIVEEPLISTCOUNT'] = ActiveEPCount
+                packet_temp['SRC_ADDR'] = struct.unpack('>I', bytearray([0, 0, ord(bc[5]), ord(bc[6])]))[0]
 
         else:
             self.ByteCodeZigBee_logging.debug("BAD HEADER")

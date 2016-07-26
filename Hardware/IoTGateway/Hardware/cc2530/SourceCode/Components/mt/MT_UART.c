@@ -95,6 +95,10 @@ uint16  MT_UartMaxZAppBufLen;
 bool    MT_UartZAppRxStatus;
 #endif
 
+CacheDeviceTable *CacheDeviceTablePtr;
+
+void testWriteNV( void );
+
 
 //void cicmdOnOff(uint16 destAddr,,char * name,char * strCommand,char * addrType);
 
@@ -155,6 +159,9 @@ void MT_UartInit ()
   MT_UartMaxZAppBufLen  = 1;
   MT_UartZAppRxStatus   = MT_UART_ZAPP_RX_READY;
 #endif
+  
+  
+  InitCacheDeviceTable ();
 
 }
 
@@ -257,9 +264,34 @@ void uartHandleCommand( uint8 port, uint8 event ){
           //sprintf(test,"zdpCmdStatus : %d",zdpCmdStatus);
           //debug_str(test);
           //debug_str(PROCESS_GW_UART_SUCESSS);
-        }
-        
-        else if(!strcmp(args[0],"IDENTIFY")){
+        }else if(!strcmp(args[0],"READATTR")){
+          
+          
+          afAddrType_t *addr;
+          addr = osal_mem_alloc(sizeof(afAddrType_t));
+          addr->endPoint = (uint8)atoi(args[1]);
+          
+          if(atoi(args[2]) == 0){
+              addr->addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr->addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr->addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          
+          addr->addr.shortAddr = (uint16)atoi(args[3]);
+          zclReadCmd_t readCmd;
+          readCmd.numAttr = 1;
+          readCmd.attrID[0] = (uint16)atoi(args[5]);
+          
+          
+          //args[4] is cluster id
+          
+          zcl_SendRead( 8, addr, (uint16)atoi(args[4]), &readCmd, ZCL_FRAME_CLIENT_SERVER_DIR, FALSE, 0);
+          
+          osal_mem_free(addr);
+          
+        }else if(!strcmp(args[0],"IDENTIFY")){
           afAddrType_t addr;
             if(atoi(args[2]) == 0){
               addr.addrMode = (afAddrMode_t)Addr16Bit;
@@ -271,8 +303,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
           addr.endPoint = (uint8)atoi(args[1]);
           addr.addr.shortAddr = (uint16)atoi(args[3]);
           zclGeneral_SendIdentify( 8, &addr,(uint16)atoi(args[4]), FALSE, 0);
-        }
-        else if(!strcmp(args[0],"IDENTIFYQ")){
+        }else if(!strcmp(args[0],"IDENTIFYQ")){
           afAddrType_t addr;
             if(atoi(args[2]) == 0){
               addr.addrMode = (afAddrMode_t)Addr16Bit;
@@ -282,9 +313,11 @@ void uartHandleCommand( uint8 port, uint8 event ){
               addr.addrMode = (afAddrMode_t)AddrBroadcast;
             }
           addr.endPoint = (uint8)atoi(args[1]);
+          
           addr.addr.shortAddr = (uint16)atoi(args[3]);
+          
           zclGeneral_SendIdentifyQuery( 8, &addr,FALSE, 0);
-        }else if(!strcmp(args[0],"ACTIVEEP")){
+        }else if(!strcmp(args[0],"ACTIVEEPQ")){
           zAddrType_t destAddr;
           //uint8 retValue;
           destAddr.addrMode = Addr16Bit;
@@ -309,28 +342,23 @@ void uartHandleCommand( uint8 port, uint8 event ){
           }
         }else if(!strcmp(args[0],"PERMITJOIN")){
           ZDSecMgrPermitJoining(atoi(args[1]));
-        }else if(!strcmp(args[0],"READATTR")){
+        }else if(!strcmp(args[0],"GETCACHETB")){
           
-          afAddrType_t addr;
-          addr.endPoint = (uint8)atoi(args[1]);
-          if(atoi(args[2]) == 0){
-              addr.addrMode = (afAddrMode_t)Addr16Bit;
-            }else if(atoi(args[2]) == 1){
-              addr.addrMode = (afAddrMode_t)AddrGroup;
-            }else{
-              addr.addrMode = (afAddrMode_t)AddrBroadcast;
-            }
-          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          RetrieveCacheDeviceTableToSerialPort((uint16)atoi(args[1]));
           
+          //CacheDeviceTable *temp;
+          //temp = osal_mem_alloc(sizeof(CacheDeviceTable));
+          //osal_nv_read( APP_NV_CACHE_DEVICE_TABLE , 0 , sizeof(CacheDeviceTable ), temp);
           
-          zclReadCmd_t readCmd;
-          readCmd.numAttr = 1;
-          readCmd.attrID[0] = (uint16)atoi(args[5]);
+          /*
+          char msgStr[100];
+          sprintf(msgStr,"cnt:%d d:%d,%d,%d,%d,%d",CacheDeviceTablePtr->CacheDeviceTableCount,CacheDeviceTablePtr->CacheDevice[0],CacheDeviceTablePtr->CacheDevice[1],CacheDeviceTablePtr->CacheDevice[2],CacheDeviceTablePtr->CacheDevice[3],CacheDeviceTablePtr->CacheDevice[6] );
+                        
+          HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, strlen(msgStr));
+          */
           
-          
-          //args[4] is cluster id
-          
-          zcl_SendRead( 8, &addr, (uint16)atoi(args[4]), &readCmd, ZCL_FRAME_CLIENT_SERVER_DIR, FALSE, 0);
+        }else if(!strcmp(args[0],"DELDEVONCTB")){
+          DeleteDeviceFromCacheDeviceTable( (uint16)atoi(args[1]) );
         }
         
         
@@ -388,6 +416,152 @@ void uartHandleCommand( uint8 port, uint8 event ){
   */
   
 }
+
+void testWriteNV( void ){
+
+  CacheDeviceTablePtr->CacheDeviceTableCount = 7;
+  CacheDeviceTablePtr->CacheDevice[0] = 0;
+  CacheDeviceTablePtr->CacheDevice[1] = 25486;
+  CacheDeviceTablePtr->CacheDevice[2] = 55555;
+  CacheDeviceTablePtr->CacheDevice[3] = 25486;
+  CacheDeviceTablePtr->CacheDevice[6] = 10;
+  //CacheDeviceTablePtr->CacheDevice[50] = 8;
+  UpdateCacheDeviceTableToNV();
+  
+}
+
+void InitCacheDeviceTable ( void ){
+  
+  uint8 nv_status;
+  CacheDeviceTablePtr = osal_mem_alloc(sizeof(CacheDeviceTable));
+  nv_status = osal_nv_item_init( APP_NV_CACHE_DEVICE_TABLE, sizeof(CacheDeviceTable) , NULL );
+  if( nv_status == SUCCESS ){
+    osal_nv_read( APP_NV_CACHE_DEVICE_TABLE , 0 , sizeof(CacheDeviceTable ), CacheDeviceTablePtr);
+    //debug_str("read old");
+  }else if( nv_status == NV_ITEM_UNINIT ){
+    //debug_str("read init");
+    CacheDeviceTablePtr->CacheDeviceTableCount = 0;
+    //testWriteNV();
+  }
+  
+}
+
+void AddDeviceToCacheDeviceTable( uint16 nwkid ){
+  
+  uint16 i;
+  uint8 existingFlag = 0;
+  char msgStr[7];
+  //check existing data
+  for( i = 0 ; i < CacheDeviceTablePtr->CacheDeviceTableCount ; i++){
+    if( CacheDeviceTablePtr->CacheDevice[i] == nwkid ){
+      existingFlag = 1;
+      break;
+    }
+  }
+  
+  if(existingFlag==0){
+    if( CacheDeviceTablePtr->CacheDeviceTableCount < CACHEDEVICETABLESIZE ){
+      CacheDeviceTablePtr->CacheDevice[ CacheDeviceTablePtr->CacheDeviceTableCount ] = nwkid;
+      CacheDeviceTablePtr->CacheDeviceTableCount += 1;
+      UpdateCacheDeviceTableToNV();
+      //sprintf(msgStr,"%c%c%c%c%c%c",0x54,0xfe,0x00,0x05,0x01,0x00);
+      //HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 6);
+      ReportCacheDeviceTableStatusToSerialPort( 0 );
+    }else{
+      //sprintf(msgStr,"%c%c%c%c%c%c",0x54,0xfe,0x00,0x05,0x01,0x01);
+      //HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 6);
+      ReportCacheDeviceTableStatusToSerialPort( 1 );
+    }
+  }else{
+    //sprintf(msgStr,"%c%c%c%c%c%c",0x54,0xfe,0x00,0x05,0x01,0x02);
+    //HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 6);
+    ReportCacheDeviceTableStatusToSerialPort( 2 );
+    
+  }
+  
+}
+
+void ReportCacheDeviceTableStatusToSerialPort( uint8 status ){
+
+  char msgStr[7];
+  sprintf(msgStr,"%c%c%c%c%c%c",0x54,0xfe,0x00,0x05,0x01,status);
+  HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 6);
+
+}
+
+void DeleteDeviceFromCacheDeviceTable( uint16 nwkid ){
+  
+  uint16 i;
+  uint8 findFlag = 0;
+  for( i=0 ; i< CacheDeviceTablePtr->CacheDeviceTableCount ; i++ ){
+    
+    if( CacheDeviceTablePtr->CacheDevice[i] == nwkid && findFlag == 0){
+      findFlag = 1;
+    }else if(findFlag == 1){
+      CacheDeviceTablePtr->CacheDevice[i-1] = CacheDeviceTablePtr->CacheDevice[i];
+    }
+  
+  }
+  
+  if(findFlag == 1){
+    CacheDeviceTablePtr->CacheDeviceTableCount -= 1;
+    UpdateCacheDeviceTableToNV();
+    ReportCacheDeviceTableStatusToSerialPort(4);
+  }else{
+    ReportCacheDeviceTableStatusToSerialPort(3);
+  }
+  
+
+}
+
+void RetrieveCacheDeviceTableToSerialPort ( uint16 startIndex ){
+
+  uint16 i;
+  uint16 limitEachRound = startIndex+50;
+  uint8 tailCount;
+  uint8 *startIndexTemp = intToByteArray(startIndex,2);
+  uint8 *CacheDeviceAmount = intToByteArray( CacheDeviceTablePtr->CacheDeviceTableCount ,2);
+  uint8 byteCount;
+  //uint8 byteCount = 9+( CacheDeviceTablePtr->CacheDeviceTableCount*2 );
+  if( (CacheDeviceTablePtr->CacheDeviceTableCount - startIndex)>=50  ){
+    
+    byteCount = 9+( 50*2 );
+  
+  }else{
+    
+    byteCount = 9+( (CacheDeviceTablePtr->CacheDeviceTableCount - startIndex)*2 );
+  
+  }
+  
+  
+  //debug_str("");
+  
+  char *msgStr = osal_mem_alloc(byteCount+1);
+  sprintf(msgStr,"%c%c%c%c%c%c%c%c%c",0x54,0xfe,0x00,0x04,byteCount-5,*CacheDeviceAmount,*(CacheDeviceAmount+1),*startIndexTemp,*(startIndexTemp+1) );
+  tailCount = 9;
+  for( i=startIndex ; (i<(CacheDeviceTablePtr->CacheDeviceTableCount)) && (i<limitEachRound) ; i++ ){
+    char temp[3];
+    uint8 *nwkid = intToByteArray(CacheDeviceTablePtr->CacheDevice[i],2);
+    sprintf(temp,"%c%c",*nwkid,*(nwkid+1));
+    memcpy(msgStr+(tailCount),temp,2);
+    tailCount+=2;
+    osal_mem_free(nwkid);
+  }
+  
+  HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, byteCount);
+  osal_mem_free(msgStr);
+  osal_mem_free(startIndexTemp);
+  osal_mem_free(CacheDeviceAmount);
+  
+
+}
+
+void UpdateCacheDeviceTableToNV( void ){
+  
+  osal_nv_write( APP_NV_CACHE_DEVICE_TABLE , 0 , sizeof(CacheDeviceTable) , CacheDeviceTablePtr);
+
+}
+
 
 /***************************************************************************************************
  * @fn          convert int to byte array
