@@ -86,6 +86,9 @@ def readInputSerial(ser):
             if counterPayloadByte <= 0:
                 _cmdList.append(_temp)
                 _temp = []
+                #reset header
+                value = ''
+                valueBefore = ''
         elif valueBefore == chr(0x54) and counterPayloadByte <= 0:
             value = ser.read(1)
             if value == chr(0xfe):
