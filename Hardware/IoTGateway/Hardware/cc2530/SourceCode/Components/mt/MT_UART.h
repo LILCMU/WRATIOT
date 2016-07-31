@@ -118,6 +118,7 @@ extern void DeleteDeviceFromCacheDeviceTable ( uint16 nwkid );
 
 extern void RetrieveCacheDeviceTableToSerialPort ( uint16 startIndex );
 void ReportCacheDeviceTableStatusToSerialPort ( uint8 status );
+void SimpleDescriptorQuery ( uint16 nwkid , uint8 ep );
 
 
 

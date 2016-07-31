@@ -68,6 +68,31 @@ class ByteCodeZigBee:
                 packet_temp['ACTIVEEPLIST'] = ActiveEPList
                 packet_temp['ACTIVEEPLISTCOUNT'] = ActiveEPCount
                 packet_temp['SRC_ADDR'] = struct.unpack('>I', bytearray([0, 0, ord(bc[5]), ord(bc[6])]))[0]
+            elif cmd_pack == 7:
+                packet_temp['CMD'] = 7
+                packet_temp['SRC_ADDR'] = struct.unpack('>I', bytearray([0, 0, ord(bc[5]), ord(bc[6])]))[0]
+                packet_temp['EP'] = ord(bc[7])
+                packet_temp['APPLICATION_PROFILE_ID'] = struct.unpack('>I', bytearray([0, 0, ord(bc[8]), ord(bc[9])]))[0]
+                packet_temp['APPLICATION_DEVICE_ID'] = struct.unpack('>I', bytearray([0, 0, ord(bc[10]), ord(bc[11])]))[0]
+                packet_temp['APPLICATION_DEVICE_VERSION'] = ord(bc[12])
+                packet_temp['RESERVED'] = ord(bc[13])
+
+                packet_temp['APPLICATION_NUM_IN_CLUSTERS'] = ord(bc[14])
+                APPLICATION_IN_CLUSTERS_LIST = []
+                APPLICATION_OUT_CLUSTERS_LIST = []
+                index_count = 15
+                for i in range(0,packet_temp['APPLICATION_NUM_IN_CLUSTERS']):
+                    APPLICATION_IN_CLUSTERS_LIST.append( struct.unpack('>I', bytearray([0, 0, ord(bc[15+(i*2)]), ord(bc[16+(i*2)])]))[0] )
+                    index_count = index_count + 2
+                packet_temp['APPLICATION_IN_CLUSTERS'] = APPLICATION_IN_CLUSTERS_LIST
+
+
+                packet_temp['APPLICATION_NUM_OUT_CLUSTERS'] = ord(bc[index_count])
+                index_count = index_count + 1
+                for i in range(0, packet_temp['APPLICATION_NUM_OUT_CLUSTERS']):
+                    APPLICATION_OUT_CLUSTERS_LIST.append( struct.unpack('>I', bytearray([0, 0, ord(bc[index_count + (i * 2)]), ord(bc[index_count+ 1 + (i * 2)])]))[0])
+                packet_temp['APPLICATION_OUT_CLUSTERS'] = APPLICATION_OUT_CLUSTERS_LIST
+
 
         else:
             self.ByteCodeZigBee_logging.debug("BAD HEADER")

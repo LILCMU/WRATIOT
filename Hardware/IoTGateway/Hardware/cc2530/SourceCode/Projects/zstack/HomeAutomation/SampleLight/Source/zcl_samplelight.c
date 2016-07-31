@@ -360,7 +360,9 @@ void zclSampleLight_Init( byte task_id )
   
   ZDO_RegisterForZDOMsg(task_id, IEEE_addr_rsp );
   
-  ZDO_RegisterForZDOMsg(task_id, Active_EP_rsp ); 
+  ZDO_RegisterForZDOMsg(task_id, Active_EP_rsp );
+  
+  ZDO_RegisterForZDOMsg(task_id, Simple_Desc_rsp ); 
 
 
 #if (defined HAL_BOARD_ZLIGHT) || (defined HAL_PWM)
@@ -413,7 +415,7 @@ void zclSampleLight_Init( byte task_id )
   /* HeartBeat LED For Hopher.
      Implement OSAL Timer Interrupt (Z-Stack Timer not Hardware) for toggle led P1_0
   */
-#if defined(HEARTBEAT_LED)
+#if defined(HEARTBEAT_LED_WAVESHARE) || defined(HEARTBEAT_LED_USB_DONGLE)
     
   osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT, 500 );
   
@@ -502,11 +504,22 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
     return ( events ^ SAMPLELIGHT_MAIN_SCREEN_EVT );
   }
   
-#if defined(HEARTBEAT_LED)
+#if defined(HEARTBEAT_LED_WAVESHARE)
   if ( events & SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT )
   {
     
     HalLedSet (HAL_LED_2, HAL_LED_MODE_TOGGLE);
+    osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT, 500 );
+        
+    return ( events ^ SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT );
+  }
+#endif
+  
+#if defined(HEARTBEAT_LED_USB_DONGLE)
+  if ( events & SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT )
+  {
+    
+    HalLedSet (HAL_LED_1, HAL_LED_MODE_TOGGLE);
     osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT, 500 );
         
     return ( events ^ SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT );
@@ -1843,6 +1856,72 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
     osal_mem_free(msgStr);
     osal_mem_free(temp);
     osal_mem_free(SrtAddr);
+  
+  }
+  else if(pMsg->clusterID == Simple_Desc_rsp){
+  
+    //debug_str("GGGG");
+    
+    ZDO_SimpleDescRsp_t *pSimpleDescRsp;
+    pSimpleDescRsp = osal_mem_alloc(sizeof(ZDO_SimpleDescRsp_t));
+    ZDO_ParseSimpleDescRsp( pMsg , pSimpleDescRsp );
+    
+    
+    uint8 packetSize = 15+((pSimpleDescRsp->simpleDesc.AppNumInClusters)*2)+1+((pSimpleDescRsp->simpleDesc.AppNumOutClusters)*2);
+    char *msgStr = osal_mem_alloc(packetSize+1);
+    char *temp = osal_mem_alloc(3);
+    
+    uint8 *SrtAddr = intToByteArray(pSimpleDescRsp->nwkAddr,2);
+    uint8 *AppProId = intToByteArray(pSimpleDescRsp->simpleDesc.AppProfId,2);
+    uint8 *AppDeviceId = intToByteArray(pSimpleDescRsp->simpleDesc.AppDeviceId,2);
+    
+    uint8 tailCount = 15;
+    
+    sprintf(msgStr,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,0x00,0x07,packetSize-5, *SrtAddr,*(SrtAddr+1) ,pSimpleDescRsp->simpleDesc.EndPoint ,*AppProId,*(AppProId+1) ,*AppDeviceId,*(AppDeviceId+1)  ,pSimpleDescRsp->simpleDesc.AppDevVer , pSimpleDescRsp->simpleDesc.Reserved ,pSimpleDescRsp->simpleDesc.AppNumInClusters);
+    
+    for(uint8 i = 0; i<pSimpleDescRsp->simpleDesc.AppNumInClusters; i++){
+      
+      
+      uint8 *ClusterId = intToByteArray(pSimpleDescRsp->simpleDesc.pAppInClusterList[i],2);
+      sprintf(temp,"%c%c",*ClusterId,*(ClusterId+1));
+      memcpy( msgStr+tailCount,temp,2 );
+      
+      
+      tailCount+=2;
+      osal_mem_free(ClusterId);
+    
+    }
+    
+    //tailCount-=1;
+    sprintf(temp,"%c",pSimpleDescRsp->simpleDesc.AppNumOutClusters);
+    memcpy( msgStr+tailCount,temp,1 );
+    
+    tailCount+=1;
+    for(uint8 i = 0; i<pSimpleDescRsp->simpleDesc.AppNumOutClusters; i++){
+      
+      
+      uint8 *ClusterId = intToByteArray(pSimpleDescRsp->simpleDesc.pAppOutClusterList[i],2);
+      sprintf(temp,"%c%c",*ClusterId,*(ClusterId+1));
+      memcpy( msgStr+tailCount,temp,2 );
+      
+      
+      tailCount+=2;
+      osal_mem_free(ClusterId);
+    
+    }
+    
+    HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, packetSize);
+    
+    //function notices to free this array pointer.
+    osal_mem_free(pSimpleDescRsp->simpleDesc.pAppInClusterList);
+    osal_mem_free(pSimpleDescRsp->simpleDesc.pAppOutClusterList);
+    
+    osal_mem_free(pSimpleDescRsp);
+    osal_mem_free(msgStr);
+    osal_mem_free(SrtAddr);
+    osal_mem_free(AppProId);
+    osal_mem_free(temp);
+    
   
   }
   

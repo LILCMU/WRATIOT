@@ -264,7 +264,9 @@ void uartHandleCommand( uint8 port, uint8 event ){
           //sprintf(test,"zdpCmdStatus : %d",zdpCmdStatus);
           //debug_str(test);
           //debug_str(PROCESS_GW_UART_SUCESSS);
-        }else if(!strcmp(args[0],"READATTR")){
+        }
+        
+        else if(!strcmp(args[0],"READATTR")){
           
           
           afAddrType_t *addr;
@@ -292,31 +294,36 @@ void uartHandleCommand( uint8 port, uint8 event ){
           osal_mem_free(addr);
           
         }else if(!strcmp(args[0],"IDENTIFY")){
-          afAddrType_t addr;
+          afAddrType_t *addr;
+          addr = osal_mem_alloc(sizeof(afAddrType_t));
+          
             if(atoi(args[2]) == 0){
-              addr.addrMode = (afAddrMode_t)Addr16Bit;
+              addr->addrMode = (afAddrMode_t)Addr16Bit;
             }else if(atoi(args[2]) == 1){
-              addr.addrMode = (afAddrMode_t)AddrGroup;
+              addr->addrMode = (afAddrMode_t)AddrGroup;
             }else{
-              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+              addr->addrMode = (afAddrMode_t)AddrBroadcast;
             }
-          addr.endPoint = (uint8)atoi(args[1]);
-          addr.addr.shortAddr = (uint16)atoi(args[3]);
-          zclGeneral_SendIdentify( 8, &addr,(uint16)atoi(args[4]), FALSE, 0);
+          addr->endPoint = (uint8)atoi(args[1]);
+          addr->addr.shortAddr = (uint16)atoi(args[3]);
+          zclGeneral_SendIdentify( 8, addr,(uint16)atoi(args[4]), FALSE, 0);
+          osal_mem_free(addr);
         }else if(!strcmp(args[0],"IDENTIFYQ")){
-          afAddrType_t addr;
+          afAddrType_t *addr;
+          addr = osal_mem_alloc(sizeof(afAddrType_t));
             if(atoi(args[2]) == 0){
-              addr.addrMode = (afAddrMode_t)Addr16Bit;
+              addr->addrMode = (afAddrMode_t)Addr16Bit;
             }else if(atoi(args[2]) == 1){
-              addr.addrMode = (afAddrMode_t)AddrGroup;
+              addr->addrMode = (afAddrMode_t)AddrGroup;
             }else{
-              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+              addr->addrMode = (afAddrMode_t)AddrBroadcast;
             }
-          addr.endPoint = (uint8)atoi(args[1]);
+          addr->endPoint = (uint8)atoi(args[1]);
           
-          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          addr->addr.shortAddr = (uint16)atoi(args[3]);
           
-          zclGeneral_SendIdentifyQuery( 8, &addr,FALSE, 0);
+          zclGeneral_SendIdentifyQuery( 8, addr,FALSE, 0);
+          osal_mem_free(addr);
         }else if(!strcmp(args[0],"ACTIVEEPQ")){
           zAddrType_t destAddr;
           //uint8 retValue;
@@ -357,9 +364,30 @@ void uartHandleCommand( uint8 port, uint8 event ){
           HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, strlen(msgStr));
           */
           
-        }else if(!strcmp(args[0],"DELDEVONCTB")){
+        }
+
+        else if(!strcmp(args[0],"DELDEVONCTB")){
           DeleteDeviceFromCacheDeviceTable( (uint16)atoi(args[1]) );
         }
+        
+        else if(!strcmp(args[0],"SPDESCQ")){
+          SimpleDescriptorQuery ( (uint16)atoi(args[2]) , (uint8)atoi(args[1]) );
+        }
+        
+        else if(!strcmp(args[0],"CPDESCQ")){
+          
+          char ff[20];
+          zAddrType_t hh;
+          hh.addr.shortAddr = (uint16)atoi(args[1]);
+          hh.addrMode = 2;
+          ZDP_ComplexDescReq( &hh ,(uint16)atoi(args[1]),0 );
+        
+          sprintf(ff," %x ",(uint16)atoi(args[1]));
+          debug_str(ff);
+          
+        }
+        
+        
         
         
         
@@ -441,6 +469,7 @@ void InitCacheDeviceTable ( void ){
   }else if( nv_status == NV_ITEM_UNINIT ){
     //debug_str("read init");
     CacheDeviceTablePtr->CacheDeviceTableCount = 0;
+    UpdateCacheDeviceTableToNV();
     //testWriteNV();
   }
   
@@ -479,6 +508,16 @@ void AddDeviceToCacheDeviceTable( uint16 nwkid ){
     
   }
   
+}
+
+void SimpleDescriptorQuery ( uint16 nwkid , uint8 ep ){
+
+  zAddrType_t *addr = osal_mem_alloc(sizeof(zAddrType_t));
+  addr->addrMode = (afAddrMode_t)Addr16Bit;
+  addr->addr.shortAddr = nwkid;
+  ZDP_SimpleDescReq( addr, nwkid , ep, 0);
+  osal_mem_free(addr);
+
 }
 
 void ReportCacheDeviceTableStatusToSerialPort( uint8 status ){
