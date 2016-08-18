@@ -1460,7 +1460,7 @@
           <state>SECURE=1</state>
           <state>TC_LINKKEY_JOIN</state>
           <state>NV_INIT</state>
-          <state>xNV_RESTORE</state>
+          <state>NV_RESTORE</state>
           <state>xHOLD_AUTO_START</state>
           <state>ZTOOL_P1</state>
           <state>MT_TASK</state>
@@ -1485,6 +1485,9 @@
           <state>MT_UART_DEFAULT_MAX_RX_BUFF=200</state>
           <state>HAL_PA_LNA</state>
           <state>xLIL_HOPHER</state>
+          <state>xLIL_HOPHER_RESET_BUTTON</state>
+          <state>xISR_KEYINTERRUPT</state>
+          <state>LIL_HOPHER_HOLDKEY_1_RESET</state>
         </option>
         <option>
           <name>CCPreprocFile</name>

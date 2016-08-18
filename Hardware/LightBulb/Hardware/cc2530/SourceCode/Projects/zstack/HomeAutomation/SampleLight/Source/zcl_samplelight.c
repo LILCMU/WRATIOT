@@ -107,6 +107,8 @@
 #include "string.h"
 #include "MT_UART.h"
 
+#include "stdio.h"
+
 /*********************************************************************
  * MACROS
  */
@@ -136,6 +138,18 @@
 byte zclSampleLight_TaskID;
 uint8 zclSampleLightSeqNum;
 
+#if defined(LIL_HOPHER_HOLDKEY_1_RESET)
+  
+  /*
+   * LIL_HOPHER_HOLDKEY_START_FLAG
+   * 0 = no interrupt , 1 = interrupt
+   * LIL_HOPHER_HOLDKEY_COUNTER
+   * 
+   */
+  //uint8 LIL_HOPHER_HOLDKEY_START_FLAG = 0;
+  uint8 LIL_HOPHER_HOLDKEY_COUNTER = 0;
+
+#endif
 
 /*********************************************************************
  * GLOBAL FUNCTIONS
@@ -400,6 +414,10 @@ void zclSampleLight_Init( byte task_id )
 #if defined(HAL_PA_LNA) /* && defined(LIL_HOPHER) */
   ZMacSetTransmitPower(TX_PWR_PLUS_19);
 #endif  
+
+#if defined(LIL_HOPHER_HOLDKEY_1_RESET)
+  osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT, 500 );
+#endif
   
 }
 
@@ -536,6 +554,62 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
     return ( events ^ SAMPLELIGHT_LEVEL_CTRL_EVT );
   }
 #endif
+  
+#if defined(LIL_HOPHER_HOLDKEY_1_RESET)
+  if (events & SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT)
+  {
+    
+    //char a[20];
+    uint8 timer_count1 = 5;
+    //debug_str("HoldChk");
+    //sprintf(a,"k %d f %d c %d",HAL_PUSH_BUTTON1(),LIL_HOPHER_HOLDKEY_START_FLAG,LIL_HOPHER_HOLDKEY_COUNTER);
+    //debug_str(a);
+    
+    if(HAL_PUSH_BUTTON1()==0 && LIL_HOPHER_HOLDKEY_COUNTER<timer_count1){
+      
+      //debug_str("incr");
+      
+      LIL_HOPHER_HOLDKEY_COUNTER += 1;
+    }else if(HAL_PUSH_BUTTON1()==0 && LIL_HOPHER_HOLDKEY_COUNTER>=timer_count1){
+      //push until led toggle
+      //waveshare led toggle
+      
+      //debug_str("reachtog");
+      
+      HalLedSet (HAL_LED_2, HAL_LED_MODE_TOGGLE);
+    }else if(HAL_PUSH_BUTTON1()==1 && LIL_HOPHER_HOLDKEY_COUNTER>=timer_count1){
+      //release button after reach timer_count1 times
+      HalLedSet (HAL_LED_2, HAL_LED_MODE_ON);
+      LIL_HOPHER_HOLDKEY_COUNTER = 0;
+      
+      //debug_str("release");
+      
+      //zclSampleLight_BasicResetCB();
+      
+      zgWriteStartupOptions(ZG_STARTUP_SET, ( ZCD_STARTOPT_DEFAULT_NETWORK_STATE | ZCD_STARTOPT_DEFAULT_CONFIG_STATE) );
+      SystemReset();
+      
+    }else{
+      LIL_HOPHER_HOLDKEY_COUNTER = 0;
+      
+      //debug_str("notreachclr");
+      
+    }
+    
+    /*
+    if(LIL_HOPHER_HOLDKEY_COUNTER>timer_count1){
+      debug_str("reach 5");
+      LIL_HOPHER_HOLDKEY_COUNTER = 0;
+      zclSampleLight_BasicResetCB();
+      
+    }
+    */
+    
+    osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT, 500 );
+    return ( events ^ SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT );
+    
+  }
+#endif
 
   // Discard unknown events
   return 0;
@@ -658,6 +732,17 @@ static void zclSampleLight_HandleKeys( byte shift, byte keys )
   {
     giLightScreenMode = giLightScreenMode ? LIGHT_MAINMODE : LIGHT_HELPMODE;
   }
+  
+#if  defined(LIL_HOPHER_RESET_BUTTON)
+  
+  if( keys & HAL_KEY_SW_6 )
+  {
+      //debug_str("Hit btn 6");
+      //zclSampleLight_BasicResetCB();
+  }
+  
+#endif
+  
 
   // update the display, including the light
   zclSampleLight_LcdDisplayUpdate();
