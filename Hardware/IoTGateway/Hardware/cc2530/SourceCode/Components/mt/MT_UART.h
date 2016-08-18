@@ -116,9 +116,14 @@ extern void AddDeviceToCacheDeviceTable ( uint16 nwkid );
 extern void UpdateCacheDeviceTableToNV ( void );
 extern void DeleteDeviceFromCacheDeviceTable ( uint16 nwkid );
 
+void DeleteAllDeviceFromCacheDeviceTable ( void );
+
 extern void RetrieveCacheDeviceTableToSerialPort ( uint16 startIndex );
 void ReportCacheDeviceTableStatusToSerialPort ( uint8 status );
 void SimpleDescriptorQuery ( uint16 nwkid , uint8 ep );
+
+//tell serial queue in python to send another command
+void SerialCommandProcessStatus( uint8 status );
 
 
 

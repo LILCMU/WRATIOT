@@ -327,8 +327,6 @@
           <state>ZCL_DIAGNOSTIC</state>
           <state>FEATURE_SYSTEM_STATS</state>
           <state>xZDO_IEEEADDR_REQUEST</state>
-          <state>MT_UART_DEFAULT_MAX_TX_BUFF=200</state>
-          <state>MT_UART_DEFAULT_MAX_RX_BUFF=200</state>
           <state>xHAL_PA_LNA</state>
           <state>xLIL_HOPHER</state>
           <state>xHEARTBEAT_LED_USB_DONGLE</state>

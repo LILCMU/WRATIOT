@@ -370,6 +370,10 @@ void uartHandleCommand( uint8 port, uint8 event ){
           DeleteDeviceFromCacheDeviceTable( (uint16)atoi(args[1]) );
         }
         
+        else if(!strcmp(args[0],"DELALLDEVONCTB")){
+          DeleteAllDeviceFromCacheDeviceTable();
+        }
+        
         else if(!strcmp(args[0],"SPDESCQ")){
           SimpleDescriptorQuery ( (uint16)atoi(args[2]) , (uint8)atoi(args[1]) );
         }
@@ -388,15 +392,16 @@ void uartHandleCommand( uint8 port, uint8 event ){
         }
         
         
+        SerialCommandProcessStatus(1);
         
         
         
-        //reset argcount
-        argcount = 0;
         //free memory
-        for(int i = 0; i < argcount; i++){
+        for(int i = 0; i <= argcount; i++){
           osal_mem_free(args[i]);
         }
+        //reset argcount
+        argcount = 0;
         
       }
     
@@ -456,6 +461,14 @@ void testWriteNV( void ){
   //CacheDeviceTablePtr->CacheDevice[50] = 8;
   UpdateCacheDeviceTableToNV();
   
+}
+
+void SerialCommandProcessStatus( uint8 status ){
+  
+  char msgStr[7];
+  sprintf(msgStr,"%c%c%c%c%c%c",0x54,0xfe,0x00,0x08,0x01,status);
+  HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 6);
+
 }
 
 void InitCacheDeviceTable ( void ){
@@ -550,6 +563,14 @@ void DeleteDeviceFromCacheDeviceTable( uint16 nwkid ){
     ReportCacheDeviceTableStatusToSerialPort(3);
   }
   
+
+}
+
+void DeleteAllDeviceFromCacheDeviceTable ( void ){
+  
+  CacheDeviceTablePtr->CacheDeviceTableCount = 0;
+  UpdateCacheDeviceTableToNV();
+  ReportCacheDeviceTableStatusToSerialPort( 5 );
 
 }
 
