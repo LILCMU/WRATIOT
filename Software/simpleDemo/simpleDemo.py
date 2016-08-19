@@ -11,6 +11,9 @@ import struct
 from simpleDemoConfig import simpleDemoConfig
 from CoreSystem.byteCodeZigBee import ByteCodeZigBee
 
+GatewayConfig_temp = simpleDemoConfig.GatewayConfig('CONFIG_GATEWAY.csv')
+GatewayConfig_temp.loadConfig()
+
 MQTTclient = mqtt.Client()
 
 def is_hex(s):
@@ -20,7 +23,7 @@ def is_hex(s):
 
 def initSerial():
     sp = serial.Serial()
-    sp.port = simpleDemoConfig.ZIGBEE_RS232_NAME
+    sp.port = GatewayConfig_temp.ZIGBEE_RS232_NAME
     sp.baudrate = 115200
     sp.parity = serial.PARITY_NONE
     sp.bytesize = serial.EIGHTBITS
@@ -40,7 +43,7 @@ ser = sp
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     # client.subscribe("/ZigBeeAtmel/toMQTT")
-    client.subscribe(simpleDemoConfig.CORE_CMD_FROM_MQTT_TO_GATEWAY)
+    client.subscribe(GatewayConfig_temp.CORE_CMD_FROM_MQTT_TO_GATEWAY)
     # client.subscribe(self.pathMqtt)
 
 def on_message(client, userdata, msg):
@@ -49,19 +52,19 @@ def on_message(client, userdata, msg):
         cmd = "ONOFF 255 0 "+ str(int("35846",10)) +" 1"
         writeCommandToSerial(ser, cmd)
         #mock up response
-        MQTTclient.publish(simpleDemoConfig.CORE_RESPONSE_FROM_GATEWAY_TO_MQTT, 'ON', 0, True)
+        MQTTclient.publish(GatewayConfig_temp.CORE_RESPONSE_FROM_GATEWAY_TO_MQTT, 'ON', 0, True)
     elif msg.payload == "OFF":
         cmd = "ONOFF 255 0 "+ str(int("35846",10)) +" 0"
         writeCommandToSerial(ser, cmd)
         #mock up response
-        MQTTclient.publish(simpleDemoConfig.CORE_RESPONSE_FROM_GATEWAY_TO_MQTT, 'OFF', 0, True)
+        MQTTclient.publish(GatewayConfig_temp.CORE_RESPONSE_FROM_GATEWAY_TO_MQTT, 'OFF', 0, True)
 
 
 
 def startMQTTserver():
     MQTTclient.on_connect = on_connect
     MQTTclient.on_message = on_message
-    MQTTclient.connect("188.166.233.211", 1883, 60)
+    MQTTclient.connect(GatewayConfig_temp.MQTT_SERVER_IP, GatewayConfig_temp.MQTT_SERVER_PORT, GatewayConfig_temp.MQTT_SERVER_KEEPALIVE)
     MQTTclient.loop_start()
 
 # use quene list to get data from serial and add to quene list
@@ -148,10 +151,29 @@ if __name__ == '__main__':
 
     startMQTTserver()
 
+
     while True:
         n = raw_input("Type Command : ")
         writeCommandToSerial(sp, n)
 
+    '''
+    i = 0
+    onoff = 0
+    list_temp = [23027,31815,33867,29502,28108,2878,26370,12709,33867,44720,41618]
+    list_status = [0,0,0,0,0,0,0,0,0,0,0]
+    while True:
+        #n = raw_input("Type Command : ")
+        print "Round : " + str(i)
+        i = i+1
+        for i in range(0,len(list_temp)):
+            if list_status[i] == 1:
+                list_status[i] = 0
+            else:
+                list_status[i] = 1
+            n = "ONOFF 8 0 "+ str(list_temp[i]) +" "+str(list_status[i])
+            writeCommandToSerial(sp, n)
+            time.sleep(0.2)
+    '''
 
     """
     print "hello"
