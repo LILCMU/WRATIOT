@@ -1,3 +1,5 @@
+# Copyright (c) 2015 Supakorn Yukonthong
+
 import logging
 #import json
 import struct
@@ -92,7 +94,9 @@ class ByteCodeZigBee:
                 for i in range(0, packet_temp['APPLICATION_NUM_OUT_CLUSTERS']):
                     APPLICATION_OUT_CLUSTERS_LIST.append( struct.unpack('>I', bytearray([0, 0, ord(bc[index_count + (i * 2)]), ord(bc[index_count+ 1 + (i * 2)])]))[0])
                 packet_temp['APPLICATION_OUT_CLUSTERS'] = APPLICATION_OUT_CLUSTERS_LIST
-
+            elif cmd_pack == 8:
+                packet_temp['CMD'] = 8
+                packet_temp['STATUS'] = ord(bc[5])
 
         else:
             self.ByteCodeZigBee_logging.debug("BAD HEADER")
