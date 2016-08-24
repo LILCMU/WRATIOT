@@ -258,6 +258,7 @@ extern "C"
 
 // NV Items Reserved for applications (user applications)
 // 0x0401 – 0x0FFF
+#define APP_NV_CACHE_DEVICE_TABLE            0x0402
 
 
 // ZCD_NV_STARTUP_OPTION values

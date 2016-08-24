@@ -85,11 +85,47 @@ extern "C"
 #define MT_UART_ZAPP_RX_NOT_READY         0x00
 #define MT_UART_ZAPP_RX_READY             0x01
 
+#define CACHEDEVICETABLESIZE 51
+
 typedef struct
 {
   osal_event_hdr_t  hdr;
   uint8             *msg;
 } mtOSALSerialData_t;
+
+/*
+ * Declare Cache device table variable
+ *
+ */
+
+//be careful serial buffer is 128
+//50 device may cost 100 byte
+
+
+typedef struct
+{
+  uint16 CacheDeviceTableCount;
+  uint16 CacheDevice[CACHEDEVICETABLESIZE];
+
+} CacheDeviceTable;
+
+
+extern void InitCacheDeviceTable ( void );
+//extern void RetrieveCacheDeviceTable ( uint8 startIndex , uint8 count );
+extern void AddDeviceToCacheDeviceTable ( uint16 nwkid );
+extern void UpdateCacheDeviceTableToNV ( void );
+extern void DeleteDeviceFromCacheDeviceTable ( uint16 nwkid );
+
+void DeleteAllDeviceFromCacheDeviceTable ( void );
+
+extern void RetrieveCacheDeviceTableToSerialPort ( uint16 startIndex );
+void ReportCacheDeviceTableStatusToSerialPort ( uint8 status );
+void SimpleDescriptorQuery ( uint16 nwkid , uint8 ep );
+
+//tell serial queue in python to send another command
+void SerialCommandProcessStatus( uint8 status );
+
+
 
 /*
  * Initialization
@@ -130,6 +166,11 @@ extern void MT_UartZAppBufferLengthRegister ( uint16 maxLen );
  * Turn Application flow control ON/OFF
  */
 extern void MT_UartAppFlowControl ( uint8 status );
+   
+/*
+ * 
+ */
+extern uint8 * intToByteArray ( uint16 intVal , uint8 byteLenght );
 
 /***************************************************************************************************
 ***************************************************************************************************/

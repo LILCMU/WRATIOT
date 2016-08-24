@@ -327,10 +327,10 @@
           <state>ZCL_DIAGNOSTIC</state>
           <state>FEATURE_SYSTEM_STATS</state>
           <state>xZDO_IEEEADDR_REQUEST</state>
-          <state>MT_UART_DEFAULT_MAX_TX_BUFF=200</state>
           <state>xHAL_PA_LNA</state>
           <state>xLIL_HOPHER</state>
-          <state>HEARTBEAT_LED</state>
+          <state>xHEARTBEAT_LED_USB_DONGLE</state>
+          <state>HEARTBEAT_LED_WAVESHARE</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -502,7 +502,6 @@
           <state>$PROJ_DIR$\..\..\Source</state>
           <state>$PROJ_DIR$\..\..\..\ZMain\TI2530DB</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\include</state>
-          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\include</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\high_level</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\mac\low_level\srf04</state>
@@ -520,6 +519,7 @@
           <state>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac\f8w</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -4758,6 +4758,136 @@
           <file>
             <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_types.h</name>
           </file>
+        </group>
+      </group>
+      <group>
+        <name>CC2530USB</name>
+        <excluded>
+          <configuration>CoordinatorEB</configuration>
+          <configuration>RouterZLight</configuration>
+        </excluded>
+        <group>
+          <name>Config</name>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_board_cfg.h</name>
+          </file>
+        </group>
+        <group>
+          <name>Drivers</name>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_adc.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_dma.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_flash.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_key.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_lcd.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_led.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_sleep.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_startup.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_uart.c</name>
+          </file>
+        </group>
+        <group>
+          <name>Includes</name>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_aes.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_dma.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_mcu.h</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\hal_types.h</name>
+          </file>
+        </group>
+        <group>
+          <name>USB</name>
+          <group>
+            <name>class_cdc</name>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\class_cdc\usb_cdc.h</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\class_cdc\usb_cdc_descriptor.s51</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\class_cdc\usb_cdc_hooks.c</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\class_cdc\usb_cdc_hooks.h</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\class_cdc\usb_firmware_library_config.c</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\class_cdc\usb_firmware_library_config.h</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\class_cdc\usb_firmware_library_headers.h</name>
+            </file>
+          </group>
+          <group>
+            <name>library</name>
+            <group>
+              <name>cc2531</name>
+              <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\cc2531\usb_board_cfg.h</name>
+              </file>
+              <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\cc2531\usb_interrupt.c</name>
+              </file>
+              <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\cc2531\usb_suspend.c</name>
+              </file>
+            </group>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_descriptor_parser.c</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_descriptor_parser.h</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_framework.c</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_framework.h</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_framework_structs.h</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_interrupt.h</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_reg.h</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_standard_requests.c</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_standard_requests.h</name>
+            </file>
+            <file>
+              <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\usb_suspend.h</name>
+            </file>
+          </group>
         </group>
       </group>
       <group>

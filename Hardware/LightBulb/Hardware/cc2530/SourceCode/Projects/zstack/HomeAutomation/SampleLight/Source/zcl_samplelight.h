@@ -68,6 +68,10 @@ extern "C"
 #define SAMPLELIGHT_LEVEL_CTRL_EVT           0x0020
 #define SAMPLELIGHT_START_EZMODE_EVT         0x0040  
 
+#if defined(LIL_HOPHER_HOLDKEY_1_RESET)
+  #define SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT   0x0060
+#endif
+
 // Application Display Modes
 #define LIGHT_MAINMODE      0x00
 #define LIGHT_HELPMODE      0x01
