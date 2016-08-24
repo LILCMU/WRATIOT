@@ -59,7 +59,7 @@ class MqttMananagement:
             if record_temp['CMDNAME'] == "ONOFF":
                 #print "ON"
                 try:
-                    sp_message = "ONOFF %d %d %d %d" % (record_temp['EP'],0,record_temp['SRCADDR'],int(msg.payload))
+                    sp_message = "ONOFF %d %d %d %d" % (record_temp['EP'],0,record_temp['SRCADDR'], 1 if msg.payload == 'ON' else 0  )
                     self.serialProcessIns.SendStringToHardwareGateway(sp_message)
 
                     sp_message = "READATTR %d %d %d %d %d" % (record_temp['EP'], 0, record_temp['SRCADDR'], 6, 0)
@@ -133,11 +133,23 @@ class MqttMananagement:
                                     and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp['SRC_ADDR'] \
                                     and d['CLUSTERID'] == json_temp['CLUSTER_ID'] and d['ATTRIBUTEID'] == json_temp['ATTR_ID'] \
                                     and d['CLUSTERID'] == json_temp['CLUSTER_ID'] ] ) > 0:
+                        #find tuple
                         tuple_temp = [ d for d in self.GatewayConfigIns.ROUTINE_TOPIC_LIST if str(d['CMDNAME']) == 'READATTR' \
                                     and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp['SRC_ADDR'] \
                                     and d['CLUSTERID'] == json_temp['CLUSTER_ID'] and d['ATTRIBUTEID'] == json_temp['ATTR_ID'] \
                                     and d['CLUSTERID'] == json_temp['CLUSTER_ID'] ]
                         print "consumeQueue : found" + str(tuple_temp)
+                        #onoff
+                        tuple_temp = tuple_temp[0]
+                        if tuple_temp['CLUSTERID'] == 6:
+                            if tuple_temp['ATTRIBUTEID'] == 0:
+                                data_temp = ''
+                                if json_temp['DATA'] == 1:
+                                    data_temp = 'ON'
+                                else:
+                                    data_temp = 'OFF'
+                                self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'),data_temp,0,False)
+
 
                 else:
                     print "consumeQueue : no cmd match"
