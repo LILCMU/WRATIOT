@@ -55,6 +55,8 @@
 #include "zcl_general.h"
 #include "ZDSecMgr.h"
 
+#include "zcl_closures.h"
+
 
 /***************************************************************************************************
  * MACROS
@@ -378,6 +380,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
           SimpleDescriptorQuery ( (uint16)atoi(args[2]) , (uint8)atoi(args[1]) );
         }
         
+        //Not Complete
         else if(!strcmp(args[0],"CPDESCQ")){
           
           char ff[20];
@@ -391,6 +394,111 @@ void uartHandleCommand( uint8 port, uint8 event ){
           
         }
         
+        else if(!strcmp(args[0],"DOORLOCKCMD")){
+          
+          afAddrType_t addr;
+          //uint8 pinCode[5] = {4,1,2,3,4};
+          //zclDoorLock_t pPayload;
+          //pPayload.pPinRfidCode = pinCode;
+          
+          
+          addr.endPoint = (uint8)atoi(args[1]);
+          if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          
+          if(atoi(args[4]) == 1){
+            zcl_SendCommand( 8 , &addr , ZCL_CLUSTER_ID_CLOSURES_DOOR_LOCK,
+                            0, TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
+                            FALSE , 0, 0, 0, NULL );
+            //zclClosures_SendDoorLockLockDoor( (uint8)atoi(args[1]) , &addr , &pPayload , FALSE , 0);
+            
+          }else{
+            zcl_SendCommand( 8 , &addr , ZCL_CLUSTER_ID_CLOSURES_DOOR_LOCK,
+                            1, TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
+                            FALSE , 0, 0, 0, NULL );
+            //zclClosures_SendDoorLockUnlockDoor( (uint8)atoi(args[1]) , &addr , &pPayload , FALSE , 0);
+          }
+        
+        }
+        
+        else if(!strcmp(args[0],"SENDCMD")){
+          
+          afAddrType_t addr;
+          uint8 *payload_temp;
+          payload_temp = osal_mem_alloc((uint16)atoi(args[6]));
+          addr.endPoint = (uint8)atoi(args[1]);
+          if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          
+          /* arg4 = cluster id
+           * arg5 = command id
+           * arg6 = payload lenght
+           * arg7 = payload data (not available now until convert all to byte code)
+           */
+          
+          memcpy(payload_temp,args[7],(uint16)atoi(args[6]));
+          zcl_SendCommand( 8 , &addr , (uint16)atoi(args[4]) ,
+                            (uint16)atoi(args[5]) , TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
+                            FALSE , 0, 0, (uint16)atoi(args[6]) , payload_temp );
+          
+          //HalUARTWrite(MT_UART_DEFAULT_PORT, args[7] , 10);
+          
+          osal_mem_free(payload_temp);
+        
+        }
+        
+        else if(!strcmp(args[0],"DLOCKADDUSER")){
+          
+          zclDoorLockSetPINCode_t userDetailTuple;
+          afAddrType_t addr;
+          userDetailTuple.userID = (uint16)atoi(args[4]);
+          userDetailTuple.userStatus = USER_STATUS_OCCUPIED_ENABLED;
+          userDetailTuple.userType = USER_TYPE_UNRESTRICTED_USER;
+          //fix length now
+          uint8 *pPIN_temp;
+          pPIN_temp = osal_mem_alloc(5);
+          pPIN_temp[0] = 4;
+          pPIN_temp[1] = (uint8)atoi(args[5]);
+          pPIN_temp[2] = (uint8)atoi(args[6]);
+          pPIN_temp[3] = (uint8)atoi(args[7]);
+          pPIN_temp[4] = (uint8)atoi(args[8]);
+          userDetailTuple.pPIN = pPIN_temp;
+          
+          
+          
+          addr.endPoint = (uint8)atoi(args[1]);
+          if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          
+          zclClosures_SendDoorLockSetPINCodeRequest( 8 , &addr , &userDetailTuple , FALSE ,0);
+          
+          osal_mem_free(pPIN_temp);
+          
+        }
+        
+        /*
+        zcl_SendReportCmd( uint8 srcEP, afAddrType_t *dstAddr,
+                             uint16 clusterID, zclReportCmd_t *reportCmd,
+                             uint8 direction, uint8 disableDefaultRsp, uint8 seqNum );
+        */
         
         SerialCommandProcessStatus(1);
         
