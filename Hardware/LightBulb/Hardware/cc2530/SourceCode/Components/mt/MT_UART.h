@@ -90,6 +90,10 @@ typedef struct
   osal_event_hdr_t  hdr;
   uint8             *msg;
 } mtOSALSerialData_t;
+  
+#define LOGOCHIPREGISTERSIZE 32
+
+
 
 /*
  * Initialization
