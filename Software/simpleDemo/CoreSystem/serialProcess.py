@@ -3,6 +3,7 @@ import threading
 import Queue
 import logging
 import time
+import ast
 from CoreSystem.byteCodeZigBee import ByteCodeZigBee
 from simpleDemoConfig import simpleDemoConfig
 
@@ -113,13 +114,36 @@ class SerialProcess:
 
     def writeStringToSerial(self,cmd):
         cmd = cmd + "\n"
-        cmd = cmd.encode('ascii')
+        #cmd = cmd.encode('ascii')
         print "Write to Serial : " + cmd
         self.sp.write(cmd)
         #time.sleep(0.01)
 
     def SendStringToHardwareGateway(self,string_temp):
-        self.StringToHardwareGatewayQueue.put(string_temp)
+        #On hardware, we use space to separate parameter.
+        #So we only support 10 parameters.
+        if string_temp.count(' ') <= 10:
+            #use for SENDCMD payload
+            #Not complete (In Beta)
+            if len(string_temp.split()) == 8:
+                string_split_temp = string_temp.split()
+                if string_split_temp[0] == 'SENDCMD':
+                    print "ok"
+                    print ast.literal_eval(string_split_temp[7])
+                    payloadTemp = ast.literal_eval(string_split_temp[7])
+                    payloadTemp_convertToByteCode = string_split_temp[0] +' '+ string_split_temp[1] +' '+ \
+                                                    string_split_temp[2] +' '+ string_split_temp[3] +' '+ \
+                                                    string_split_temp[4] +' '+ string_split_temp[5] +' '+ \
+                                                    string_split_temp[6] +' '
+
+                    for i in payloadTemp:
+                        payloadTemp_convertToByteCode += chr(i)
+                    print len(payloadTemp_convertToByteCode)
+                    string_temp = payloadTemp_convertToByteCode
+
+            self.StringToHardwareGatewayQueue.put(string_temp)
+        else:
+            print "TOO MUCH PARAMETERS"
 
 
     def processSendStringToHardwareGateway(self):
@@ -184,10 +208,18 @@ if __name__ == "__main__":
         SerialProcess_temp.SendStringToHardwareGateway("gggggg")
 
 
+    toggle_on_off = 1
     for i in range(0,200):
         print "round : " + str(i)
-        SerialProcess_temp.SendStringToHardwareGateway("READATTR 8 0 46831 6 0")
+        #SerialProcess_temp.SendStringToHardwareGateway("READATTR 8 0 46831 6 0")
+        if toggle_on_off == 1:
+            toggle_on_off = 0
+        else:
+            toggle_on_off = 1
+        SerialProcess_temp.SendStringToHardwareGateway("SENDCMD 8 0 18492 6 "+str(toggle_on_off)+" 0 0")
+        time.sleep(0.05)
     '''
+
     while True:
         n = raw_input("Type Command : ")
         SerialProcess_temp.SendStringToHardwareGateway(n)
