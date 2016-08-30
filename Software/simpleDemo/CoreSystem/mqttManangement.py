@@ -149,6 +149,7 @@ class MqttMananagement:
                                 else:
                                     data_temp = 'OFF'
                                 self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'),data_temp,0,False)
+                                self.MQTTclient.publish(tuple_temp['TOPICSTATUS'].encode('ascii'), data_temp, 0, True)
 
 
                 else:
@@ -164,6 +165,9 @@ class MqttMananagement:
     def startMQTTserver(self):
         self.MQTTclient.on_connect = self.on_connect
         self.MQTTclient.on_message = self.on_message
+        #set username and password for ACL
+        if self.GatewayConfigIns.MQTT_SERVER_ACL_CONFIG == 'ENABLE':
+            self.MQTTclient.username_pw_set(self.GatewayConfigIns.MQTT_SERVER_ACL_USERNAME,self.GatewayConfigIns.MQTT_SERVER_ACL_PASSWORD)
         #while True:
         #    try:
         self.MQTTclient.connect(self.GatewayConfigIns.MQTT_SERVER_IP, self.GatewayConfigIns.MQTT_SERVER_PORT, self.GatewayConfigIns.MQTT_SERVER_KEEPALIVE)
