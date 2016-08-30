@@ -107,6 +107,7 @@
 #include "string.h"
 #include "MT_UART.h"
 #include "stdio.h"
+#include "ZDSecMgr.h"
 
 /*********************************************************************
  * MACROS
@@ -410,6 +411,10 @@ void zclSampleLight_Init( byte task_id )
   */
 #if defined(HAL_PA_LNA) /* && defined(LIL_HOPHER) */
   ZMacSetTransmitPower(TX_PWR_PLUS_19);
+#endif
+  
+#if defined(START_WITH_PERMITJOIN_0) 
+  ZDSecMgrPermitJoining(0);
 #endif
   
   /* HeartBeat LED For Hopher.
