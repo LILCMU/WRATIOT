@@ -1471,7 +1471,6 @@
           <state>MULTICAST_ENABLED=FALSE</state>
           <state>ZCL_READ</state>
           <state>ZCL_WRITE</state>
-          <state>ZCL_REPORT</state>
           <state>ZCL_EZMODE</state>
           <state>ZCL_BASIC</state>
           <state>ZCL_IDENTIFY</state>
@@ -1484,10 +1483,13 @@
           <state>MT_UART_DEFAULT_MAX_TX_BUFF=200</state>
           <state>MT_UART_DEFAULT_MAX_RX_BUFF=200</state>
           <state>HAL_PA_LNA</state>
-          <state>xLIL_HOPHER</state>
+          <state>LIL_HOPHER</state>
           <state>xLIL_HOPHER_RESET_BUTTON</state>
           <state>xISR_KEYINTERRUPT</state>
           <state>LIL_HOPHER_HOLDKEY_1_RESET</state>
+          <state>ZCL_REPORT</state>
+          <state>GEKKO_REPORT</state>
+          <state>ZIGBEE_WRITE_REGISTER_GEKKO</state>
         </option>
         <option>
           <name>CCPreprocFile</name>

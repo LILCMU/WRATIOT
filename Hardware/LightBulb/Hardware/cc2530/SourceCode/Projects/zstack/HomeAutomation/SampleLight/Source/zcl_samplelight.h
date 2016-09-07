@@ -69,7 +69,11 @@ extern "C"
 #define SAMPLELIGHT_START_EZMODE_EVT         0x0040  
 
 #if defined(LIL_HOPHER_HOLDKEY_1_RESET)
-  #define SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT   0x0060
+  #define SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT   0x0080
+#endif
+   
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+  #define SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT   0x0100
 #endif
 
 // Application Display Modes

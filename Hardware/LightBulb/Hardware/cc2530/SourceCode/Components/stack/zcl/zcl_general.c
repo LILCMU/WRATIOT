@@ -3127,6 +3127,16 @@ static ZStatus_t zclGeneral_ProcessInOnOff( zclIncoming_t *pInMsg,
         break;
 #endif // ZCL_LIGHT_LINK_ENHANCE
 
+#ifdef ZIGBEE_WRITE_REGISTER_GEKKO
+    case COMMAND_ZIGBEE_WRITE_REGISTER_GEKKO:
+      if ( pCBs->pfnOnOff_ZigBee_Write_Register_Gekko )
+      {
+        pCBs->pfnOnOff_ZigBee_Write_Register_Gekko( pInMsg->hdr.commandID );
+      }
+      break;
+#endif
+        
+        
       default:
         stat = ZFailure;
         break;

@@ -92,8 +92,10 @@ typedef struct
 } mtOSALSerialData_t;
   
 #define LOGOCHIPREGISTERSIZE 32
+#define DEFAULTPACKETTYPE 0
+#define GEKKOPACKETTYPE 11
 
-
+//extern uint8 LogoChipRegister[32];
 
 /*
  * Initialization
@@ -134,6 +136,8 @@ extern void MT_UartZAppBufferLengthRegister ( uint16 maxLen );
  * Turn Application flow control ON/OFF
  */
 extern void MT_UartAppFlowControl ( uint8 status );
+
+uint8 checkSumGekko( uint8 *arr, uint8 arrLen );
 
 /***************************************************************************************************
 ***************************************************************************************************/
