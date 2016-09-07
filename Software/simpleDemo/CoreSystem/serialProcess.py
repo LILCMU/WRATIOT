@@ -19,7 +19,7 @@ class SerialProcess:
         self.StringToHardwareGatewayQueue = Queue.Queue()
         self.StringToHardwareGateway_event = threading.Event()
         self.StringToHardwareGateway_event.set()
-        self.ByteCodeInterpreter = ByteCodeZigBee(loggingLevel=logging.DEBUG)
+        self.ByteCodeInterpreter = ByteCodeZigBee(loggingLevel=loggingLevel)
 
     def initSerialPort(self):
         self.sp.port = self.GatewayConfigIns.ZIGBEE_RS232_NAME
@@ -157,7 +157,7 @@ class SerialProcess:
                 #print "Exit with set"
             else:
                 #report to serial report topic
-                self.mqttManagementIns.putMessageToQueue({'CMD':9,'STATUS':2})
+                self.mqttManagementIns.putMessageToQueue({'CMD':8,'STATUS':2})
 
                 #prevent when serial message is larger than cc2530 buffer.
                 #But cc2530 is still working. We give cc2530 an opportunity to have chance to process
@@ -185,11 +185,12 @@ def gg():
 if __name__ == "__main__":
     simpleDemoConfig_temp = simpleDemoConfig.GatewayConfig('../CONFIG_GATEWAY.csv')
     simpleDemoConfig_temp.loadConfig()
+    #print simpleDemoConfig_temp.MQTT_PROJECT_ID
 
-    MqttMananagementIns = MqttMananagement(GatewayConfigIns=simpleDemoConfig_temp)
+    MqttMananagementIns = MqttMananagement(loggingLevel=None,GatewayConfigIns=simpleDemoConfig_temp)
 
-
-    SerialProcess_temp = SerialProcess(loggingLevel=logging.DEBUG,GatewayConfigIns=simpleDemoConfig_temp)
+    #loggingLevel=logging.DEBUG
+    SerialProcess_temp = SerialProcess(loggingLevel=None,GatewayConfigIns=simpleDemoConfig_temp)
     SerialProcess_temp.init()
 
     SerialProcess_temp.setInstanceOfMqttManagement(MqttMananagementIns)
