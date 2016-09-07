@@ -334,6 +334,7 @@
           <state>xHEARTBEAT_LED_USB_DONGLE</state>
           <state>HEARTBEAT_LED_WAVESHARE</state>
           <state>START_WITH_PERMITJOIN_0</state>
+          <state>GEKKO_REPORT</state>
         </option>
         <option>
           <name>CCPreprocFile</name>

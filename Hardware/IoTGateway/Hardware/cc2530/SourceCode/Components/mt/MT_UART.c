@@ -346,8 +346,10 @@ void uartHandleCommand( uint8 port, uint8 event ){
           addr.addr.shortAddr = (uint16)atoi(args[3]);  // assign the destination address
           if(!strcmp(args[4],"1")){
             zclGeneral_SendOnOff_CmdOn(8,&addr,FALSE,0);
-          }else{
+          }else if(!strcmp(args[4],"0")){
             zclGeneral_SendOnOff_CmdOff(8,&addr,FALSE,0);
+          }else if(!strcmp(args[4],"2")){
+            zclGeneral_SendOnOff_CmdToggle(8,&addr,FALSE,0);
           }
         }else if(!strcmp(args[0],"PERMITJOIN")){
           ZDSecMgrPermitJoining(atoi(args[1]));
@@ -494,11 +496,78 @@ void uartHandleCommand( uint8 port, uint8 event ){
           
         }
         
-        /*
-        zcl_SendReportCmd( uint8 srcEP, afAddrType_t *dstAddr,
-                             uint16 clusterID, zclReportCmd_t *reportCmd,
-                             uint8 direction, uint8 disableDefaultRsp, uint8 seqNum );
-        */
+        else if(!strcmp(args[0],"SENDREPORT")){
+          
+          debug_str("ReportCMD");
+          
+          
+          afAddrType_t addr;
+          uint8 attrCount = 1;
+          
+          zclReportCmd_t *reportCmdTemp = osal_mem_alloc( sizeof(zclReportCmd_t) + (sizeof( zclReport_t ) * attrCount) );
+          
+          //zclReport_t reportTuple = osal_mem_alloc(sizeof(zclReport_t));
+          zclReport_t reportTuple[1];
+          
+          uint8 attrData[2];
+          attrData[0] = (uint8)atoi(args[4]) & 0xff;
+          attrData[1] = (uint8)atoi(args[4]) >> 8;
+          
+          
+          reportTuple[0].attrData = attrData;
+          reportTuple[0].attrID = 5;
+          reportTuple[0].dataType = ZCL_DATATYPE_UINT16;
+          reportCmdTemp->attrList[0] = reportTuple[0];
+          reportCmdTemp->numAttr = 1;
+          
+          
+          addr.endPoint = (uint8)atoi(args[1]);
+          if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          
+          
+          zcl_SendReportCmd( 8, &addr, 0xFC01 , reportCmdTemp,
+                             ZCL_FRAME_CLIENT_SERVER_DIR , FALSE, 0 );
+        
+          //pDiscoverExtRsp = (zclDiscoverAttrsExtRsp_t *)zcl_mem_alloc( sizeof (zclDiscoverAttrsExtRsp_t)
+           //                                              + sizeof ( zclExtAttrInfo_t ) * numAttrs );
+          
+          //osal_mem_free(reportTuple);
+          osal_mem_free(reportCmdTemp);
+          
+        }
+        
+        else if(!strcmp(args[0],"WREGGEKKO")){
+          
+          afAddrType_t addr;
+          uint8 payload_temp[2] = {0,0};
+          //register position
+          payload_temp[0] = (uint8)atoi(args[4]);
+          //register value
+          payload_temp[1] = (uint8)atoi(args[5]);
+          
+          
+          addr.endPoint = (uint8)atoi(args[1]);
+          if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          
+          zcl_SendCommand( 8 , &addr , ZCL_CLUSTER_ID_GEN_ON_OFF,
+                            0x50, TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
+                            FALSE , 0, 0, 2, payload_temp );
+        
+        }
         
         SerialCommandProcessStatus(1);
         

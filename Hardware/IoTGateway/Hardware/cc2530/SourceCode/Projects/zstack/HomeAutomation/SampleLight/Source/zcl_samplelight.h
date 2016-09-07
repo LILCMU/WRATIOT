@@ -71,6 +71,12 @@ extern "C"
 #if defined(HEARTBEAT_LED_WAVESHARE) || defined(HEARTBEAT_LED_USB_DONGLE)
   #define SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT 0x0041
 #endif
+   
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+//Manufactorer Cluster custom for LIL Gekko
+#define ZCL_CLUSTER_ID_LIL_GEKKO 0xFC01
+   
+#endif
 
 // Application Display Modes
 #define LIGHT_MAINMODE      0x00

@@ -9,15 +9,14 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=1440463470
+Checksum=-1051183198
 [CallStack]
 ShowArgs=0
 [Disassembly]
 MixedMode=1
 [Breakpoints]
-Bp0=_ "STD_CODE" "{$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_UART.c}.466.11" 1 0 0 0 "" 0 ""
-Bp1=_ "STD_CODE" "{$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_UART.c}.493.11" 1 0 0 0 "" 0 ""
-Count=2
+Bp0=_ "STD_CODE" "{$PROJ_DIR$\..\..\..\..\..\Components\mt\MT_UART.c}.549.17" 1 0 0 0 "" 0 ""
+Count=1
 [ChipconEmu]
 Stop timers on halt=0
 Leave target running=1
