@@ -154,6 +154,10 @@ uint8 zclSampleLightSeqNum;
 /*********************************************************************
  * GLOBAL FUNCTIONS
  */
+  
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+ extern uint8 LogoChipRegister[32];
+#endif
 
 /*********************************************************************
  * LOCAL VARIABLES
@@ -219,6 +223,9 @@ static void zclSampleLight_BasicResetCB( void );
 static void zclSampleLight_IdentifyCB( zclIdentify_t *pCmd );
 static void zclSampleLight_IdentifyQueryRspCB( zclIdentifyQueryRsp_t *pRsp );
 static void zclSampleLight_OnOffCB( uint8 cmd );
+#ifdef ZIGBEE_WRITE_REGISTER_GEKKO
+  static void zclSampleLight_OnOffCB_ZigBee_Write_Register_Gekko( uint8 cmd );
+#endif
 static void zclSampleLight_ProcessIdentifyTimeChange( void );
 #ifdef ZCL_LEVEL_CTRL
 static void zclSampleLight_LevelControlMoveToLevelCB( zclLCMoveToLevel_t *pCmd );
@@ -260,6 +267,10 @@ static uint8 zclSampleLight_ProcessInDiscAttrsRspCmd( zclIncomingMsg_t *pInMsg )
 static uint8 zclSampleLight_ProcessInDiscAttrsExtRspCmd( zclIncomingMsg_t *pInMsg );
 #endif
 
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+static void reportGekkoRegisterToCoordinator( void );
+#endif
+
 /*********************************************************************
  * STATUS STRINGS
  */
@@ -293,6 +304,9 @@ static zclGeneral_AppCallbacks_t zclSampleLight_CmdCallbacks =
   NULL,                                   // On/Off cluster enhanced command Off with Effect
   NULL,                                   // On/Off cluster enhanced command On with Recall Global Scene
   NULL,                                   // On/Off cluster enhanced command On with Timed Off
+#ifdef ZIGBEE_WRITE_REGISTER_GEKKO
+  zclSampleLight_OnOffCB_ZigBee_Write_Register_Gekko,   // On/Off cluster commands
+#endif
 #ifdef ZCL_LEVEL_CTRL
   zclSampleLight_LevelControlMoveToLevelCB, // Level Control Move to Level command
   zclSampleLight_LevelControlMoveCB,        // Level Control Move command
@@ -417,6 +431,10 @@ void zclSampleLight_Init( byte task_id )
 
 #if defined(LIL_HOPHER_HOLDKEY_1_RESET)
   osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT, 500 );
+#endif
+  
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+  osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 1000 );
 #endif
   
 }
@@ -555,6 +573,8 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
   }
 #endif
   
+  
+  
 #if defined(LIL_HOPHER_HOLDKEY_1_RESET)
   if (events & SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT)
   {
@@ -608,6 +628,19 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
     osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT, 500 );
     return ( events ^ SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT );
     
+  }
+#endif
+  
+  
+  
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+  if (events & SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT)
+  {
+   
+    reportGekkoRegisterToCoordinator();
+    
+    osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 1000 );
+    return ( events ^ SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT );
   }
 #endif
 
@@ -922,6 +955,13 @@ static void zclSampleLight_ProcessIdentifyTimeChange( void )
   {
     osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_IDENTIFY_TIMEOUT_EVT, 1000 );
     HalLedBlink ( HAL_LED_4, 0xFF, HAL_LED_DEFAULT_DUTY_CYCLE, HAL_LED_DEFAULT_FLASH_TIME );
+    
+#ifdef LIL_HOPHER
+    uint8 Beep_Gekko_Packet[7];
+    sprintf(Beep_Gekko_Packet,"%c%c%c%c%c%c",0x54,0xfe,0x03,0x00,0x0b,0x0b);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, Beep_Gekko_Packet, 6);
+#endif
+    
   }
   else
   {
@@ -1022,15 +1062,20 @@ static void zclSampleLight_IdentifyQueryRspCB(  zclIdentifyQueryRsp_t *pRsp )
  */
 static void zclSampleLight_OnOffCB( uint8 cmd )
 {
-  afIncomingMSGPacket_t *pPtr = zcl_getRawAFMsg();
+  //afIncomingMSGPacket_t *pPtr = zcl_getRawAFMsg();
 
-  zclSampleLight_DstAddr.addr.shortAddr = pPtr->srcAddr.addr.shortAddr;
+  //zclSampleLight_DstAddr.addr.shortAddr = pPtr->srcAddr.addr.shortAddr;
 
   uint8 Logo_UserLED_On[] = {0x54,0xfe,0x04,0x00,0x0a,0x01,0x0b};
   uint8 Logo_UserLED_Off[] = {0x54,0xfe,0x04,0x00,0x0a,0x00,0x0a};
-  uint8 Logo_SetActivePort_D1[] = {0x54,0xfe,0x04,0x00,0x07,0x01,0x08};
-  uint8 Logo_Motor_On[] = {0x54,0xfe,0x05,0x00,0x02,0x00,0x01,0x03};
-  uint8 Logo_Motor_Off[] = {0x54,0xfe,0x05,0x00,0x02,0x00,0x00,0x02};
+  //uint8 Logo_SetActivePort_D1[] = {0x54,0xfe,0x04,0x00,0x07,0x01,0x08};
+  //uint8 Logo_Motor_On[] = {0x54,0xfe,0x05,0x00,0x02,0x00,0x01,0x03};
+  //uint8 Logo_Motor_Off[] = {0x54,0xfe,0x05,0x00,0x02,0x00,0x00,0x02};
+  
+  //Gekko Relay on D2 and Panel Led on D4
+  //0b1010, bit 0-3 = PIN D1-D4
+  uint8 Logo_Relay_And_Panel_Led_On[] = {0x54,0xfe,0x05,0x00,0x02,0x0a,0x01,0x0d};
+  uint8 Logo_Relay_And_Panel_Led_Off[] = {0x54,0xfe,0x05,0x00,0x02,0x0a,0x00,0x0c};
 
   // Turn on the light
   if ( cmd == COMMAND_ON )
@@ -1038,8 +1083,9 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
     zclSampleLight_OnOff = LIGHT_ON;
     HalLedSet (HAL_LED_ALL, HAL_LED_MODE_ON);
     HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_UserLED_On, 7);
-    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_SetActivePort_D1, 7);
-    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Motor_On, 8);
+    //HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_SetActivePort_D1, 7);
+    //HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Motor_On, 8);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Relay_And_Panel_Led_On, 8);
   }
   // Turn off the light
   else if ( cmd == COMMAND_OFF )
@@ -1047,8 +1093,9 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
     zclSampleLight_OnOff = LIGHT_OFF;
     HalLedSet (HAL_LED_ALL, HAL_LED_MODE_OFF);
     HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_UserLED_Off, 7);
-    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_SetActivePort_D1, 7);
-    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Motor_Off, 8);
+    //HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_SetActivePort_D1, 7);
+    //HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Motor_Off, 8);
+    HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Relay_And_Panel_Led_Off, 8);
   }
   // Toggle the light
   else if ( cmd == COMMAND_TOGGLE )
@@ -1056,10 +1103,16 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
     if ( zclSampleLight_OnOff == LIGHT_OFF )
     {
       zclSampleLight_OnOff = LIGHT_ON;
+      HalLedSet (HAL_LED_ALL, HAL_LED_MODE_ON);
+      HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_UserLED_On, 7);
+      HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Relay_And_Panel_Led_On, 8);
     }
     else
     {
       zclSampleLight_OnOff = LIGHT_OFF;
+      HalLedSet (HAL_LED_ALL, HAL_LED_MODE_ON);
+      HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_UserLED_Off, 7);
+      HalUARTWrite(MT_UART_DEFAULT_PORT, Logo_Relay_And_Panel_Led_Off, 8);
     }
   }
 
@@ -1070,6 +1123,46 @@ static void zclSampleLight_OnOffCB( uint8 cmd )
   // update the display
   zclSampleLight_LcdDisplayUpdate( );
 }
+
+/*********************************************************************
+ * @fn      zclSampleLight_OnOffCB_ZigBee_Write_Register_Gekko
+ *
+ * @brief   Callback from the ZCL General Cluster Library when
+ *          it received an On/Off ZigBee Write Register Gekko Command for this application.
+ *
+ * @param   cmd - COMMAND_ON, COMMAND_OFF or COMMAND_TOGGLE
+ *
+ * @return  none
+ */
+#ifdef ZIGBEE_WRITE_REGISTER_GEKKO
+static void zclSampleLight_OnOffCB_ZigBee_Write_Register_Gekko( uint8 cmd ){
+
+  afIncomingMSGPacket_t *pPtr = zcl_getRawAFMsg();
+  
+  
+  uint8 set_ptr_cmd[] = {2,1,0,*(pPtr->cmd.Data+3)};
+  uint8 set_reg_cmd[] = {2,2,1,*(pPtr->cmd.Data+4)};
+  uint8 checksum_set_ptr = checkSumGekko(set_ptr_cmd,4);
+  uint8 checksum_set_reg = checkSumGekko(set_reg_cmd,4);
+  
+  
+  uint8 msgStr[16+1];
+  sprintf(msgStr,"%c%c%c%c%c%c%c%c",0x54,0xfe,5,set_ptr_cmd[0],set_ptr_cmd[1],set_ptr_cmd[2],set_ptr_cmd[3],checksum_set_ptr);
+  sprintf(msgStr+8,"%c%c%c%c%c%c%c%c",0x54,0xfe,5,set_reg_cmd[0],set_reg_cmd[1],set_reg_cmd[2],set_reg_cmd[3],checksum_set_reg);
+  //debug_str("ZBWriteGekko");
+  HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 16);
+  
+  
+  //uint8 msgStr[30];
+  
+  //sprintf(msgStr,"ZBWGK %d %d %d %d | %d %d",pPtr->srcAddr.addr.shortAddr,pPtr->cmd.DataLength,*(pPtr->cmd.Data+3),*(pPtr->cmd.Data+4),checksum_set_ptr,checksum_set_reg);
+  //debug_str("ZBWriteGekko");
+  //HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 30);
+  
+
+}
+#endif
+
 
 #ifdef ZCL_LEVEL_CTRL
 /*********************************************************************
@@ -1784,6 +1877,89 @@ static void zclSampleLight_EZModeCB( zlcEZMode_State_t state, zclEZMode_CBData_t
   }
 }
 #endif // ZCL_EZMODE
+
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+static void reportGekkoRegisterToCoordinator( void ){
+  
+  afAddrType_t addr;
+  //uint8 attrCount = 1;
+  
+  uint8 report_Flag = 0;
+  
+  zclReportCmd_t *reportCmdTemp = osal_mem_alloc( sizeof(zclReportCmd_t) + (sizeof( zclReport_t ) * LOGOCHIPREGISTERSIZE) );
+  
+  
+  //zclReport_t reportTuple = osal_mem_alloc(sizeof(zclReport_t));
+  zclReport_t reportTuple[32];
+  
+  
+  //uint8 attrData[2];
+  //uint16 dataTemp16 = 50;
+  //attrData[0] = (uint8)dataTemp16 & 0xff;
+  //attrData[1] = (uint8)dataTemp16 >> 8;
+  
+  
+  //reportTuple[0].attrData = attrData;
+  //reportTuple[0].attrID = 5;
+  //reportTuple[0].dataType = ZCL_DATATYPE_UINT8;
+  //reportCmdTemp->attrList[0] = reportTuple[0];
+  reportCmdTemp->numAttr = 32;
+  
+  
+  addr.endPoint = (uint8)8;
+  addr.addrMode = (afAddrMode_t)Addr16Bit;
+  addr.addr.shortAddr = (uint16)0;
+  
+  for( uint8 i = 0; i <  LOGOCHIPREGISTERSIZE ; i++){
+  
+    reportTuple[i].attrData = &LogoChipRegister[i];
+    reportTuple[i].dataType = ZCL_DATATYPE_UINT8;
+    reportTuple[i].attrID = i;
+    
+    reportCmdTemp->attrList[i] = reportTuple[i];
+  
+  }
+  
+  
+  /********************
+   * validate register value to assign report flag.
+   * register 1 is IR manual on counter.
+   * register 2 is IR manual off counter.
+   * register 3 is IR Housekeeping on counter.
+   * register 4 is IR Housekeeping complete counter.
+   */
+  if(LogoChipRegister[1]!=0 || LogoChipRegister[2]!=0 || LogoChipRegister[3]!=0 || LogoChipRegister[4]!=0){
+    report_Flag = 1;
+    //please consider priority of remote and web app
+    if(LogoChipRegister[20]==0x0a){
+      zclSampleLight_OnOff = LIGHT_ON;
+    }else if(LogoChipRegister[20]==0x00){
+      zclSampleLight_OnOff = LIGHT_OFF;
+    }
+  }
+  
+  if(report_Flag == 1){
+    zcl_SendReportCmd( 8, &addr, 0xFC01 , reportCmdTemp,
+                      ZCL_FRAME_CLIENT_SERVER_DIR , FALSE, 0 );
+    report_Flag = 0;
+  }
+  
+  //char msgStr[50];  
+  //sprintf(msgStr,"rp %d %d %d %d %d",LogoChipRegister[0],LogoChipRegister[1],LogoChipRegister[2],*(reportCmdTemp->attrList[1].attrData),*(reportCmdTemp->attrList[2].attrData));
+  //debug_str(msgStr);
+  
+
+  //pDiscoverExtRsp = (zclDiscoverAttrsExtRsp_t *)zcl_mem_alloc( sizeof (zclDiscoverAttrsExtRsp_t)
+   //                                              + sizeof ( zclExtAttrInfo_t ) * numAttrs );
+  
+  //osal_mem_free(reportTuple);
+  osal_mem_free(reportCmdTemp);
+  
+  //HalLedSet (HAL_LED_2, HAL_LED_MODE_TOGGLE);
+  
+
+}
+#endif
 
 /****************************************************************************
 ****************************************************************************/
