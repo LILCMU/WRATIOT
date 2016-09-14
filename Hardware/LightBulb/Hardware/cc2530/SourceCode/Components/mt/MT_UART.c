@@ -197,17 +197,20 @@ void uartHandleCommand( uint8 port, uint8 event ){
   //switch(event) {
   // case HAL_UART_RX_FULL:
   //   HalUARTRead (port, &buffer_one_byte, 1);
-   //  HalUARTWrite(port, &buffer_one_byte, 1);
-   //  break;
+  //   HalUARTWrite(port, &buffer_one_byte, 1);
+  //   debug_str("uartfull");
+  //   break;
   // case HAL_UART_RX_ABOUT_FULL:
-   //  break;
-   //case HAL_UART_RX_TIMEOUT:
+  //   debug_str("aboutfull");
+  //   break;
+  // case HAL_UART_RX_TIMEOUT:
      
+  if (event & ( HAL_UART_RX_FULL | HAL_UART_RX_ABOUT_FULL | HAL_UART_RX_TIMEOUT)){
        
-       while( Hal_UART_RxBufLen(port) > 0 ){
+      while( Hal_UART_RxBufLen(port) ){
           HalUARTRead (port, &buffer_one_byte, 1);
           //debug_str(&buffer_one_byte);
-          HalUARTWrite(port, &buffer_one_byte, 1);
+          //HalUARTWrite(port, &buffer_one_byte, 1);
           if(buffer_one_byte==0x54){
             HalUARTRead (port, &buffer_one_byte, 1);
             
@@ -225,8 +228,12 @@ void uartHandleCommand( uint8 port, uint8 event ){
             
           }
        }
+      
+      //uint8 msgg[20];
+      //sprintf(msgg,"hr %d %d ",LogoChipRegister[1],LogoChipRegister[2]);
+      //debug_str(msgg);
        
-       
+  }
        
     /*   
     uint8  *bufferInRx;

@@ -155,9 +155,7 @@ uint8 zclSampleLightSeqNum;
  * GLOBAL FUNCTIONS
  */
   
-#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
- extern uint8 LogoChipRegister[32];
-#endif
+
 
 /*********************************************************************
  * LOCAL VARIABLES
@@ -1892,6 +1890,9 @@ static void reportGekkoRegisterToCoordinator( void ){
   //zclReport_t reportTuple = osal_mem_alloc(sizeof(zclReport_t));
   zclReport_t reportTuple[32];
   
+  //uint8 msgg[20];
+  //sprintf(msgg,"er %d %d ",LogoChipRegister[1],LogoChipRegister[2]);
+  //debug_str(msgg);
   
   //uint8 attrData[2];
   //uint16 dataTemp16 = 50;
