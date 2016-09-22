@@ -43,6 +43,31 @@ class ByteCodeZigBee:
                     packet_temp['DATA'] = ord(bc[13])
 
                 else:
+                    packet_temp['DATA_LENGTH'] = struct.unpack('>I', bytearray([0, 0, ord(bc[13]), ord(bc[14])]))[0]
+                    # uint8
+                    if packet_temp['DATA_TYPE'] == 0x20:
+                        packet_temp['DATA'] = ord(bc[15])
+                    # 32-bit BitMap
+                    elif packet_temp['DATA_TYPE'] == 0x1b:
+                        packet_temp['DATA'] = bin(struct.unpack('>I', bytearray([ord(bc[15]), ord(bc[16]) , ord(bc[17]), ord(bc[18])]))[0])
+                        print str(ord(bc[15]))
+                        print str(ord(bc[16]))
+                        print str(ord(bc[17]))
+                        print str(ord(bc[18]))
+                    # Signed 16-bit integer
+                    elif packet_temp['DATA_TYPE'] == 0x29:
+                        packet_temp['DATA'] = struct.unpack('<h', bytearray([ord(bc[15]), ord(bc[16])]))[0]
+                    # Unsigned 16-bit integer
+                    elif packet_temp['DATA_TYPE'] == 0x21:
+                        packet_temp['DATA'] = struct.unpack('<H', bytearray([ord(bc[15]), ord(bc[16])]))[0]
+                    # 8-bit enumeration
+                    elif packet_temp['DATA_TYPE'] == 0x30:
+                        packet_temp['DATA'] = ord(bc[15])
+                    # character String,first byte is size of string
+                    elif packet_temp['DATA_TYPE'] == 0x42:
+                        packet_temp['DATA'] = ''
+                        for i in range(0,packet_temp['DATA_LENGTH']-1):
+                            packet_temp['DATA'] +=  bc[16+i]
                     self.ByteCodeZigBee_logging.debug("NO DATA MATCHING")
             elif cmd_pack == 3:
                 packet_temp['CMD'] = 3

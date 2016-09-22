@@ -100,6 +100,7 @@ class SerialProcess:
                 '''
                 #print i
                 packet_fromGateway = self.ByteCodeInterpreter.interpretByteCodeToPacket(i)
+                print packet_fromGateway
                 if packet_fromGateway['CMD'] == 8:
                     print "set event"
                     time.sleep(0.1)
@@ -196,7 +197,7 @@ if __name__ == "__main__":
     SerialProcess_temp.setInstanceOfMqttManagement(MqttMananagementIns)
     MqttMananagementIns.setInstanceOfSerialProcess(SerialProcess_temp)
 
-    MqttMananagementIns.startMQTTserver()
+    #MqttMananagementIns.startMQTTserver()
     SerialProcess_temp.loop_start()
 
     #print "GG"
