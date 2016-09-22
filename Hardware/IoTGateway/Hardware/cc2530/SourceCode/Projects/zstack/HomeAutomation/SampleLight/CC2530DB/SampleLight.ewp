@@ -330,7 +330,7 @@
           <state>FEATURE_SYSTEM_STATS</state>
           <state>xZDO_IEEEADDR_REQUEST</state>
           <state>xHAL_PA_LNA</state>
-          <state>xLIL_HOPHER</state>
+          <state>LIL_HOPHER</state>
           <state>xHEARTBEAT_LED_USB_DONGLE</state>
           <state>HEARTBEAT_LED_WAVESHARE</state>
           <state>START_WITH_PERMITJOIN_0</state>

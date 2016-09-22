@@ -1564,11 +1564,51 @@ static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
     }
   default:
     {
+      
+      /*
       char *msgPrint;
       msgPrint = osal_mem_alloc( sizeof(char)*15 );
       sprintf(msgPrint,"GGGG");
       HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
       osal_mem_free( msgPrint );
+      */
+      
+      char *msgPrint;
+      //msgPrint = osal_mem_alloc( 30 );
+      
+      
+      uint8 *SrtAddr;
+      uint8 *Cmd;
+      uint8 *ClusterId;
+      uint8 *AttrId;
+      uint8 *dataLenght_byte_ptr;
+      uint16 dataLenght_byte = zclGetAttrDataLength(readRspCmd->attrList[0].dataType,readRspCmd->attrList[0].data);
+      SrtAddr = intToByteArray((uint16)pInMsg->srcAddr.addr.shortAddr ,2);
+      Cmd = intToByteArray(2,2);
+      ClusterId = intToByteArray((uint16)pInMsg->clusterId ,2);
+      AttrId = intToByteArray((uint16)readRspCmd->attrList[0].attrID ,2);
+      dataLenght_byte_ptr = intToByteArray((uint16)dataLenght_byte ,2);
+      //debug_str("here");
+      uint8 packetLength = 10 + (uint8)dataLenght_byte;
+      
+      msgPrint = osal_mem_alloc( packetLength+6 );
+      
+      sprintf(msgPrint,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),packetLength,*SrtAddr,*(SrtAddr+1), (uint8) pInMsg->srcAddr.endPoint , *ClusterId,*(ClusterId+1) , *AttrId,*(AttrId+1)  , readRspCmd->attrList[0].dataType , *dataLenght_byte_ptr , *(dataLenght_byte_ptr+1) );
+      if(dataLenght_byte>0){
+        memcpy(msgPrint+15,readRspCmd->attrList[0].data,(uint8)dataLenght_byte);
+      }
+      HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, packetLength+5);
+      //sprintf(msgPrint,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),9,*SrtAddr,*(SrtAddr+1), (uint8) pInMsg->srcAddr.endPoint , *ClusterId,*(ClusterId+1) , *AttrId,*(AttrId+1)  , readRspCmd->attrList[0].dataType , *((uint8 *) readRspCmd->attrList[0].data) );
+      //HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, 14);
+      osal_mem_free(SrtAddr);
+      osal_mem_free(Cmd);
+      osal_mem_free(ClusterId);
+      osal_mem_free(AttrId);
+      osal_mem_free(dataLenght_byte_ptr);
+      osal_mem_free( msgPrint );
+      
+      break;
+      
       
     }
     
