@@ -32,6 +32,7 @@ class SerialProcess:
         self.sp.rtscts = False
         self.sp.dsrdtr = False
         self.sp.open()
+        #time.sleep(2)
 
     def init(self):
         self.initSerialPort()
@@ -118,7 +119,7 @@ class SerialProcess:
         #cmd = cmd.encode('ascii')
         print "Write to Serial : " + cmd
         self.sp.write(cmd)
-        #time.sleep(0.01)
+        #time.sleep(0.1)
 
     def SendStringToHardwareGateway(self,string_temp):
         #On hardware, we use space to separate parameter.
@@ -170,9 +171,11 @@ class SerialProcess:
     def loop_start(self):
 
         t2 = threading.Thread(target=self.processSendStringToHardwareGateway)
+        #t2.setDaemon(True)
         t2.start()
 
         t1 = threading.Thread(target=self.readInputSerial, args=(self.sp,))
+        #t1.setDaemon(True)
         t1.start()
 
 
@@ -197,7 +200,7 @@ if __name__ == "__main__":
     SerialProcess_temp.setInstanceOfMqttManagement(MqttMananagementIns)
     MqttMananagementIns.setInstanceOfSerialProcess(SerialProcess_temp)
 
-    #MqttMananagementIns.startMQTTserver()
+    MqttMananagementIns.startMQTTserver()
     SerialProcess_temp.loop_start()
 
     #print "GG"
