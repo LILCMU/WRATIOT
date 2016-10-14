@@ -103,6 +103,47 @@ class MqttMananagement:
                     self.serialProcessIns.SendStringToHardwareGateway(sp_message)
                 except:
                     print sys.exc_info()
+            elif record_temp['CMDNAME'] == "DOORLOCKCMD":
+                # Send Door Lock Command
+                try:
+                    messageTemp = json.loads(msg.payload)
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+                try:
+                    sp_message = "DOORLOCKCMD %d %d %d %d" % (
+                    record_temp['EP'], record_temp['ADDRTYPE'], record_temp['SRCADDR'], 1 if messageTemp['VALUE'] == 'LOCK' else 0)
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+
+                    sp_message = "READATTR %d %d %d %d %d" % (
+                    record_temp['EP'], record_temp['ADDRTYPE'], record_temp['SRCADDR'], 257, 0)
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                except:
+                    print sys.exc_info()
+            elif record_temp['CMDNAME'] == "DLOCKADDUSER":
+                # Send Door Lock Command
+                try:
+                    messageTemp = json.loads(msg.payload)
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+                try:
+                    sp_message = "DLOCKADDUSER %d %d %d %d" % (
+                        record_temp['EP'], record_temp['ADDRTYPE'], record_temp['SRCADDR'],3)
+                    for usercode_temp in messageTemp['VALUE']:
+                        usercode_ord_temp = ord(usercode_temp)
+                        sp_message += " %d" % (usercode_ord_temp)
+                    #print sp_message
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+
+                    '''
+                    sp_message = "READATTR %d %d %d %d %d" % (
+                        record_temp['EP'], record_temp['ADDRTYPE'], record_temp['SRCADDR'], 257, 0)
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                    '''
+
+                except:
+                    print sys.exc_info()
 
 
                 #send read attribute follow onoff to condfirm value was change.
@@ -214,6 +255,16 @@ class MqttMananagement:
                                     data_temp = 'ON'
                                 else:
                                     data_temp = 'OFF'
+                                self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'),data_temp,self.GatewayConfigIns.MQTT_SERVER_QOS,False)
+                                self.MQTTclient.publish(tuple_temp['TOPICSTATUS'].encode('ascii'), data_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, True)
+                        elif tuple_temp['CLUSTERID'] == 257:
+                            if tuple_temp['ATTRIBUTEID'] == 0:
+                                data_temp_dict = {'VALUE':''}
+                                if json_temp['DATA'] == 1:
+                                    data_temp_dict['VALUE'] = 'LOCK'
+                                else:
+                                    data_temp_dict['VALUE'] = 'UNLOCK'
+                                data_temp = json.dumps(data_temp_dict)
                                 self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'),data_temp,self.GatewayConfigIns.MQTT_SERVER_QOS,False)
                                 self.MQTTclient.publish(tuple_temp['TOPICSTATUS'].encode('ascii'), data_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, True)
                 elif json_temp['CMD'] == 4:

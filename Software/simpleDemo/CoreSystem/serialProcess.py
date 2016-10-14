@@ -226,5 +226,8 @@ if __name__ == "__main__":
     '''
 
     while True:
-        n = raw_input("Type Command : ")
-        SerialProcess_temp.SendStringToHardwareGateway(n)
+        try:
+            n = raw_input("Type Command : ")
+            SerialProcess_temp.SendStringToHardwareGateway(n)
+        except Exception as inst:
+            print inst
