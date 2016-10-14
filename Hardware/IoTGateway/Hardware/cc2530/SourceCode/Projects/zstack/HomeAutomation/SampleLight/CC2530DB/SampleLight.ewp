@@ -330,9 +330,9 @@
           <state>FEATURE_SYSTEM_STATS</state>
           <state>xZDO_IEEEADDR_REQUEST</state>
           <state>xHAL_PA_LNA</state>
-          <state>LIL_HOPHER</state>
-          <state>xHEARTBEAT_LED_USB_DONGLE</state>
-          <state>HEARTBEAT_LED_WAVESHARE</state>
+          <state>xLIL_HOPHER</state>
+          <state>HEARTBEAT_LED_USB_DONGLE</state>
+          <state>xHEARTBEAT_LED_WAVESHARE</state>
           <state>START_WITH_PERMITJOIN_0</state>
           <state>GEKKO_REPORT</state>
         </option>
@@ -523,7 +523,10 @@
           <state>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac\f8w</state>
-          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library\cc2531</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\class_cdc</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530USB\usb\library</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -4704,6 +4707,7 @@
       <group>
         <name>CC2530EB</name>
         <excluded>
+          <configuration>CoordinatorEB</configuration>
           <configuration>RouterZLight</configuration>
         </excluded>
         <group>
@@ -4767,7 +4771,6 @@
       <group>
         <name>CC2530USB</name>
         <excluded>
-          <configuration>CoordinatorEB</configuration>
           <configuration>RouterZLight</configuration>
         </excluded>
         <group>

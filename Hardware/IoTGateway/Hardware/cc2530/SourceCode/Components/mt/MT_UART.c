@@ -204,10 +204,14 @@ void uartHandleCommand( uint8 port, uint8 event ){
   
   
   switch(event) {
+   //case HAL_UART_TX_FULL:
+     //debug_str("txfull");
    case HAL_UART_RX_FULL:
-     break;
+     //debug_str("rxfull");
+     //break;
    case HAL_UART_RX_ABOUT_FULL:
-     break;
+     //debug_str("rxabfull");
+     //break;
    case HAL_UART_RX_TIMEOUT:
      
     uint8 *bufferInRx;
@@ -496,6 +500,26 @@ void uartHandleCommand( uint8 port, uint8 event ){
           
         }
         
+        else if(!strcmp(args[0],"DLOCKCLEARUSER")){
+          
+          afAddrType_t addr;
+          
+          addr.endPoint = (uint8)atoi(args[1]);
+          if(atoi(args[2]) == 0){
+              addr.addrMode = (afAddrMode_t)Addr16Bit;
+            }else if(atoi(args[2]) == 1){
+              addr.addrMode = (afAddrMode_t)AddrGroup;
+            }else{
+              addr.addrMode = (afAddrMode_t)AddrBroadcast;
+            }
+          addr.addr.shortAddr = (uint16)atoi(args[3]);
+          
+          //zclClosures_SendDoorLockClearPINCode(  8 , &addr , (uint16)atoi(args[4]) , FALSE ,0 );
+          
+          zclClosures_SendDoorLockClearAllPINCodes( 8 , &addr , FALSE ,0  );
+          
+        }
+        
         else if(!strcmp(args[0],"SENDREPORT")){
           
           debug_str("ReportCMD");
@@ -569,7 +593,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
         
         }
         
-        SerialCommandProcessStatus(1);
+        //SerialCommandProcessStatus(1);
         
         
         
@@ -579,6 +603,8 @@ void uartHandleCommand( uint8 port, uint8 event ){
         }
         //reset argcount
         argcount = 0;
+        
+        SerialCommandProcessStatus(1);
         
       }
     
