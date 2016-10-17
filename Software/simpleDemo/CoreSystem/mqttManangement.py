@@ -67,11 +67,114 @@ class MqttMananagement:
                     self.serialProcessIns.SendStringToHardwareGateway(sp_message)
                 except:
                     print sys.exc_info()
+            elif record_temp['CMDNAME'] == "IDENTIFY":
+                # print "ON"
+                try:
+                    messageTemp = json.loads(msg.payload)
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+                try:
+                    sp_message = "IDENTIFY %d %d %d %d" % ( messageTemp['EP'], messageTemp['ADDRTYPE'], messageTemp['ADDR'], messageTemp['IDENTIFYTIME'] if messageTemp['IDENTIFYTIME'] <= 255 else 255)
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                except:
+                    print sys.exc_info()
+            elif record_temp['CMDNAME'] == "DELDEVONCTB":
+                # print "ON"
+                try:
+                    messageTemp = json.loads(msg.payload)
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+                try:
+                    sp_message = "DELDEVONCTB %d" % ( messageTemp['ADDR'] )
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                except:
+                    print sys.exc_info()
+            elif record_temp['CMDNAME'] == "PERMITJOIN":
+                # print "ON"
+                try:
+                    messageTemp = json.loads(msg.payload)
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+                try:
+                    sp_message = "PERMITJOIN %d" % (messageTemp['TIMEOUT'])
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                except:
+                    print sys.exc_info()
+            elif record_temp['CMDNAME'] == "DOORLOCKCMD":
+                # Send Door Lock Command
+                try:
+                    messageTemp = json.loads(msg.payload)
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+                try:
+                    sp_message = "DOORLOCKCMD %d %d %d %d" % (
+                    record_temp['EP'], record_temp['ADDRTYPE'], record_temp['SRCADDR'], 1 if messageTemp['VALUE'] == 'LOCK' else 0)
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+
+                    sp_message = "READATTR %d %d %d %d %d" % (
+                    record_temp['EP'], record_temp['ADDRTYPE'], record_temp['SRCADDR'], 257, 0)
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                except:
+                    print sys.exc_info()
+            elif record_temp['CMDNAME'] == "DLOCKADDUSER":
+                # Send Door Lock Command
+                try:
+                    messageTemp = json.loads(msg.payload)
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+                try:
+                    sp_message = "DLOCKADDUSER %d %d %d %d" % (
+                        record_temp['EP'], record_temp['ADDRTYPE'], record_temp['SRCADDR'],3)
+                    for usercode_temp in messageTemp['VALUE']:
+                        usercode_ord_temp = ord(usercode_temp)
+                        sp_message += " %d" % (usercode_ord_temp)
+                    #print sp_message
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+
+                    '''
+                    sp_message = "READATTR %d %d %d %d %d" % (
+                        record_temp['EP'], record_temp['ADDRTYPE'], record_temp['SRCADDR'], 257, 0)
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                    '''
+
+                except:
+                    print sys.exc_info()
 
 
                 #send read attribute follow onoff to condfirm value was change.
         elif len([d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['TOPICCMD']) == msg.topic]) > 0:
-            print msg.topic + " " + msg.payload + " MATCHING TYPE : 0"
+            print msg.topic + " " + msg.payload + " MATCHING TYPE : 2"
+            record_temp = [d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['TOPICCMD']) == msg.topic][0]
+            print record_temp
+            if record_temp['CMDNAME'] == "GETCACHETB":
+                try:
+                    messageTemp = json.loads(msg.payload)
+                    if messageTemp.has_key('CMDNAME'):
+                        sp_message = messageTemp['CMDNAME'].encode('ascii') + " %d" % (messageTemp['STARTINDEX'])
+                        self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                        #print sp_message
+                    else:
+                        print "NO CMD NAME : GETCACHETB"
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+            elif record_temp['CMDNAME'] == "IDENTIFYQ":
+                try:
+                    messageTemp = json.loads(msg.payload)
+                    if messageTemp.has_key('CMDNAME'):
+                        sp_message = "IDENTIFYQ %d %d %d" % ( messageTemp['EP'] , messageTemp['ADDRTYPE'] , messageTemp['ADDR'] )
+                        self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                        print sp_message
+                    else:
+                        print "NO CMD NAME : IDENTIFYQ"
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
         #serialProcess.gg()
 
 
@@ -154,6 +257,43 @@ class MqttMananagement:
                                     data_temp = 'OFF'
                                 self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'),data_temp,self.GatewayConfigIns.MQTT_SERVER_QOS,False)
                                 self.MQTTclient.publish(tuple_temp['TOPICSTATUS'].encode('ascii'), data_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, True)
+                        elif tuple_temp['CLUSTERID'] == 257:
+                            if tuple_temp['ATTRIBUTEID'] == 0:
+                                data_temp_dict = {'VALUE':''}
+                                if json_temp['DATA'] == 1:
+                                    data_temp_dict['VALUE'] = 'LOCK'
+                                else:
+                                    data_temp_dict['VALUE'] = 'UNLOCK'
+                                data_temp = json.dumps(data_temp_dict)
+                                self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'),data_temp,self.GatewayConfigIns.MQTT_SERVER_QOS,False)
+                                self.MQTTclient.publish(tuple_temp['TOPICSTATUS'].encode('ascii'), data_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, True)
+                elif json_temp['CMD'] == 4:
+                    #Cache Table response
+                    if len([d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'GETCACHETB']) > 0:
+                        # find tuple
+                        tuple_temp = [d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'GETCACHETB']
+                        tuple_temp = tuple_temp[0]
+                        json_string_temp = json.dumps(json_temp)
+                        self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, True)
+
+                elif json_temp['CMD'] == 3:
+                    # Identify Query response
+                    if len([d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'IDENTIFYQ']) > 0:
+                        # find tuple
+                        tuple_temp = [d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'IDENTIFYQ']
+                        tuple_temp = tuple_temp[0]
+                        json_string_temp = json.dumps(json_temp)
+                        self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, True)
+
+                elif json_temp['CMD'] == 1:
+                    # Device Annou response
+                    if len([d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if str(d['CMDNAME']) == 'DEVICEANNOC']) > 0:
+                        # find tuple
+                        tuple_temp = [d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if str(d['CMDNAME']) == 'DEVICEANNOC']
+                        tuple_temp = tuple_temp[0]
+                        json_string_temp = json.dumps(json_temp)
+                        self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, True)
+
                 elif json_temp['CMD'] == 9:
                     #print "consume report"
                     if json_temp['IR_MANUAL_OFF_COUNTER'] > 0 or json_temp['IR_MANUAL_ON_COUNTER'] > 0 or json_temp['IR_HOUSEKEEPING_OFF_COUNTER'] > 0 or json_temp['IR_HOUSEKEEPING_ON_COUNTER'] > 0:

@@ -155,9 +155,7 @@ uint8 zclSampleLightSeqNum;
  * GLOBAL FUNCTIONS
  */
   
-#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
- extern uint8 LogoChipRegister[32];
-#endif
+
 
 /*********************************************************************
  * LOCAL VARIABLES
@@ -434,7 +432,7 @@ void zclSampleLight_Init( byte task_id )
 #endif
   
 #if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
-  osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 1000 );
+  osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 5000 );
 #endif
   
 }
@@ -639,7 +637,7 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
    
     reportGekkoRegisterToCoordinator();
     
-    osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 1000 );
+    osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 5000 );
     return ( events ^ SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT );
   }
 #endif
@@ -1892,6 +1890,9 @@ static void reportGekkoRegisterToCoordinator( void ){
   //zclReport_t reportTuple = osal_mem_alloc(sizeof(zclReport_t));
   zclReport_t reportTuple[32];
   
+  //uint8 msgg[20];
+  //sprintf(msgg,"er %d %d ",LogoChipRegister[1],LogoChipRegister[2]);
+  //debug_str(msgg);
   
   //uint8 attrData[2];
   //uint16 dataTemp16 = 50;

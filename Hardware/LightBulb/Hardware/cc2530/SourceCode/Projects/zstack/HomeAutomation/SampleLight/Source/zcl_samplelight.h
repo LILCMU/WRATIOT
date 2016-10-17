@@ -118,6 +118,10 @@ extern uint16 zclSampleLight_LevelOffTransitionTime;
 extern uint8  zclSampleLight_LevelDefaultMoveRate;
 #endif
 
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+ extern uint8 LogoChipRegister[32];
+#endif
+
 /*********************************************************************
  * FUNCTIONS
  */

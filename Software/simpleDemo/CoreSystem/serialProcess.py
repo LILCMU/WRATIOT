@@ -32,6 +32,7 @@ class SerialProcess:
         self.sp.rtscts = False
         self.sp.dsrdtr = False
         self.sp.open()
+        #time.sleep(2)
 
     def init(self):
         self.initSerialPort()
@@ -100,6 +101,7 @@ class SerialProcess:
                 '''
                 #print i
                 packet_fromGateway = self.ByteCodeInterpreter.interpretByteCodeToPacket(i)
+                print packet_fromGateway
                 if packet_fromGateway['CMD'] == 8:
                     print "set event"
                     time.sleep(0.1)
@@ -117,7 +119,7 @@ class SerialProcess:
         #cmd = cmd.encode('ascii')
         print "Write to Serial : " + cmd
         self.sp.write(cmd)
-        #time.sleep(0.01)
+        #time.sleep(0.1)
 
     def SendStringToHardwareGateway(self,string_temp):
         #On hardware, we use space to separate parameter.
@@ -169,9 +171,11 @@ class SerialProcess:
     def loop_start(self):
 
         t2 = threading.Thread(target=self.processSendStringToHardwareGateway)
+        #t2.setDaemon(True)
         t2.start()
 
         t1 = threading.Thread(target=self.readInputSerial, args=(self.sp,))
+        #t1.setDaemon(True)
         t1.start()
 
 
@@ -222,5 +226,8 @@ if __name__ == "__main__":
     '''
 
     while True:
-        n = raw_input("Type Command : ")
-        SerialProcess_temp.SendStringToHardwareGateway(n)
+        try:
+            n = raw_input("Type Command : ")
+            SerialProcess_temp.SendStringToHardwareGateway(n)
+        except Exception as inst:
+            print inst
