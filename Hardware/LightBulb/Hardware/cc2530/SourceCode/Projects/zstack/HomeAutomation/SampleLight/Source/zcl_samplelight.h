@@ -75,6 +75,10 @@ extern "C"
 #if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
   #define SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT   0x0100
 #endif
+  
+#if defined(ZCL_REPORT) && defined(LOCALIZATION_NODE_REPORT)
+  #define SAMPLELIGHT_LOCALIZATION_REPORT_REGISTER_EVT   0x0200
+#endif
 
 // Application Display Modes
 #define LIGHT_MAINMODE      0x00
@@ -87,6 +91,13 @@ extern "C"
  * TYPEDEFS
  */
 
+#if defined(ZCL_REPORT) && defined(LOCALIZATION_NODE_REPORT)
+  typedef struct{
+    ZLongAddr_t eMacAddr;
+    uint8 uuid_app[10];
+  }rssi_broadCast_Data_t;
+#endif
+  
 /*********************************************************************
  * VARIABLES
  */

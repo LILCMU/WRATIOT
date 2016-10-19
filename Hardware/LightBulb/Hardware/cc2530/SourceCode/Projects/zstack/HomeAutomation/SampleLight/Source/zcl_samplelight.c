@@ -109,6 +109,10 @@
 
 #include "stdio.h"
 
+#if defined(LOCALIZATION_ZIGBEE)
+ #include "Localization_ZigBee.h"
+#endif
+
 /*********************************************************************
  * MACROS
  */
@@ -267,6 +271,10 @@ static uint8 zclSampleLight_ProcessInDiscAttrsExtRspCmd( zclIncomingMsg_t *pInMs
 
 #if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
 static void reportGekkoRegisterToCoordinator( void );
+#endif
+
+#if defined(ZCL_REPORT) && defined(LOCALIZATION_NODE_REPORT)
+static void reportLocalizationToCoordinator( void );
 #endif
 
 /*********************************************************************
@@ -433,6 +441,10 @@ void zclSampleLight_Init( byte task_id )
   
 #if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
   osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 5000 );
+#endif
+  
+#if defined(ZCL_REPORT) && defined(LOCALIZATION_NODE_REPORT)
+  osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_LOCALIZATION_REPORT_REGISTER_EVT, 1000 );
 #endif
   
 }
@@ -639,6 +651,17 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
     
     osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 5000 );
     return ( events ^ SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT );
+  }
+#endif
+  
+#if defined(ZCL_REPORT) && defined(LOCALIZATION_NODE_REPORT)
+  if (events & SAMPLELIGHT_LOCALIZATION_REPORT_REGISTER_EVT)
+  {
+   
+    reportLocalizationToCoordinator();
+    
+    osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_LOCALIZATION_REPORT_REGISTER_EVT, 1000 );
+    return ( events ^ SAMPLELIGHT_LOCALIZATION_REPORT_REGISTER_EVT );
   }
 #endif
 
@@ -1960,6 +1983,44 @@ static void reportGekkoRegisterToCoordinator( void ){
   
 
 }
+#endif
+
+#if defined(ZCL_REPORT) && defined(LOCALIZATION_NODE_REPORT)
+
+static void reportLocalizationToCoordinator( void ){
+  
+  rssi_broadCast_Data_t tuple_temp;
+  char msgStr[50];
+  byte* ptr = NLME_GetExtAddr();
+  afAddrType_t localization_addr;
+  osal_memcpy(tuple_temp.eMacAddr,ptr, sizeof(ZLongAddr_t));
+  //uint16 parent_Short_Address = NLME_GetCoordShortAddr();
+  tuple_temp.uuid_app[0] = 45;
+  
+  localization_addr.endPoint = 10;
+  localization_addr.addrMode = AddrBroadcast;
+  localization_addr.addr.shortAddr = 0xFFFC;
+  
+  uint8 gg = 0;
+  //&GenericApp_epDesc
+  
+  AF_DataRequest( &localization_addr , &GenericApp_epDesc , 1 , 0  , NULL , &gg , AF_DISCV_ROUTE | AF_SKIP_ROUTING , 1);
+  
+    //zcl_SendCommand( 8 , &localization_addr , ZCL_CLUSTER_ID_GEN_ON_OFF,
+    //                        0x50, TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
+    //                        FALSE , 0, 0, 0, NULL );
+    sprintf(msgStr,"id %d ex %x%x%x%x%x%x%x%x\n",tuple_temp.uuid_app[0],tuple_temp.eMacAddr[7],tuple_temp.eMacAddr[6],tuple_temp.eMacAddr[5],tuple_temp.eMacAddr[4],tuple_temp.eMacAddr[3],tuple_temp.eMacAddr[2],tuple_temp.eMacAddr[1],tuple_temp.eMacAddr[0]);
+    debug_str(msgStr);
+    
+  
+  
+  
+  
+  
+
+}
+
+
 #endif
 
 /****************************************************************************

@@ -3135,8 +3135,8 @@ static ZStatus_t zclGeneral_ProcessInOnOff( zclIncoming_t *pInMsg,
       }
       break;
 #endif
-        
-        
+      
+      
       default:
         stat = ZFailure;
         break;

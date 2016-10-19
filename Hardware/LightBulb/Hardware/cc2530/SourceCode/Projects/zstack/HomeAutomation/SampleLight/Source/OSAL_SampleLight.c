@@ -64,6 +64,10 @@
 
 #include "zcl_samplelight.h"
 
+#if defined(LOCALIZATION_ZIGBEE)
+ #include "Localization_ZigBee.h"
+#endif
+
 /*********************************************************************
  * GLOBAL VARIABLES
  */
@@ -85,6 +89,9 @@ const pTaskEventHandlerFn tasksArr[] = {
   ZDNwkMgr_event_loop,
 #endif
   zcl_event_loop,
+#if defined(LOCALIZATION_ZIGBEE)
+  localization_zigbee_event_loop,
+#endif
   zclSampleLight_event_loop
 };
 
@@ -126,6 +133,9 @@ void osalInitTasks( void )
   ZDNwkMgr_Init( taskID++ );
 #endif
   zcl_Init( taskID++ );
+#if defined(LOCALIZATION_ZIGBEE)
+  localization_zigbee_Init( taskID++ );
+#endif
   zclSampleLight_Init( taskID );
 }
 
