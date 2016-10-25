@@ -681,16 +681,17 @@ const cId_t zclSampleLight_InClusterList[] =
   ZCL_CLUSTER_ID_GEN_IDENTIFY,
   ZCL_CLUSTER_ID_GEN_GROUPS,
   ZCL_CLUSTER_ID_GEN_SCENES,
-  ZCL_CLUSTER_ID_GEN_ON_OFF
+  ZCL_CLUSTER_ID_GEN_ON_OFF,
+  ZCL_CLUSTER_ID_CLOSURES_DOOR_LOCK
 #ifdef ZCL_LEVEL_CTRL
   , ZCL_CLUSTER_ID_GEN_LEVEL_CONTROL
 #endif
 };
 // work-around for compiler bug... IAR can't calculate size of array with #if options.
 #ifdef ZCL_LEVEL_CTRL
- #define ZCLSAMPLELIGHT_MAX_INCLUSTERS   6
+ #define ZCLSAMPLELIGHT_MAX_INCLUSTERS   7
 #else
- #define ZCLSAMPLELIGHT_MAX_INCLUSTERS   5
+ #define ZCLSAMPLELIGHT_MAX_INCLUSTERS   6
 #endif
 
 const cId_t zclSampleLight_OutClusterList[] =

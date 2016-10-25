@@ -213,7 +213,8 @@ void uartHandleCommand( uint8 port, uint8 event ){
      //debug_str("rxabfull");
      //break;
    case HAL_UART_RX_TIMEOUT:
-     
+    
+    uint8 confirmExecuteStatus = 0;
     uint8 *bufferInRx;
     uint8 argBuffer[20];
     int argcount = 0;
@@ -603,6 +604,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
         }
         //reset argcount
         argcount = 0;
+        
         
         SerialCommandProcessStatus(1);
         

@@ -1734,6 +1734,8 @@ static uint8 zclSampleLight_ProcessInDefaultRspCmd( zclIncomingMsg_t *pInMsg )
 
   // Device is notified of the Default Response command.
   (void)pInMsg;
+  
+  debug_str("Drsp");
 
   return ( TRUE );
 }
