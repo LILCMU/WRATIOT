@@ -214,7 +214,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
      //break;
    case HAL_UART_RX_TIMEOUT:
     
-    uint8 confirmExecuteStatus = 0;
+    uint8 confirmExecuteFlag = 1;
     uint8 *bufferInRx;
     uint8 argBuffer[20];
     int argcount = 0;
@@ -247,6 +247,10 @@ void uartHandleCommand( uint8 port, uint8 event ){
        argcount++;
        countArgByteInBufferRx = 0;
         
+       //This variable is used to send execute comfirmation in this loop.
+       //On the other hand, some function have their own response like default response in onoff command.
+       //We will send comfirmation from that callback in zcl_samplelight.c
+       confirmExecuteFlag = 1;
       
        /*
         for(int k = 0;k < argcount;k++){
@@ -282,6 +286,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
           
           if(atoi(args[2]) == 0){
               addr->addrMode = (afAddrMode_t)Addr16Bit;
+              confirmExecuteFlag = 0;
             }else if(atoi(args[2]) == 1){
               addr->addrMode = (afAddrMode_t)AddrGroup;
             }else{
@@ -306,6 +311,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
           
             if(atoi(args[2]) == 0){
               addr->addrMode = (afAddrMode_t)Addr16Bit;
+              confirmExecuteFlag = 0;
             }else if(atoi(args[2]) == 1){
               addr->addrMode = (afAddrMode_t)AddrGroup;
             }else{
@@ -343,6 +349,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
           addr.endPoint = (uint8)atoi(args[1]);
           if(atoi(args[2]) == 0){
               addr.addrMode = (afAddrMode_t)Addr16Bit;
+              confirmExecuteFlag = 0;
             }else if(atoi(args[2]) == 1){
               addr.addrMode = (afAddrMode_t)AddrGroup;
             }else{
@@ -581,6 +588,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
           addr.endPoint = (uint8)atoi(args[1]);
           if(atoi(args[2]) == 0){
               addr.addrMode = (afAddrMode_t)Addr16Bit;
+              confirmExecuteFlag = 0;
             }else if(atoi(args[2]) == 1){
               addr.addrMode = (afAddrMode_t)AddrGroup;
             }else{
@@ -605,8 +613,9 @@ void uartHandleCommand( uint8 port, uint8 event ){
         //reset argcount
         argcount = 0;
         
-        
-        SerialCommandProcessStatus(1);
+        if(confirmExecuteFlag==1){
+          SerialCommandProcessStatus(1);
+        }
         
       }
     

@@ -1630,7 +1630,7 @@ static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
   */
 
   
-  
+  SerialCommandProcessStatus(1);
 
   return ( TRUE );
 }
@@ -1730,12 +1730,15 @@ static uint8 zclSampleLight_ProcessInReportCmd( zclIncomingMsg_t *pInMsg ){
  */
 static uint8 zclSampleLight_ProcessInDefaultRspCmd( zclIncomingMsg_t *pInMsg )
 {
-  // zclDefaultRspCmd_t *defaultRspCmd = (zclDefaultRspCmd_t *)pInMsg->attrCmd;
+  //zclDefaultRspCmd_t *defaultRspCmd = (zclDefaultRspCmd_t *)pInMsg->attrCmd;
 
   // Device is notified of the Default Response command.
   (void)pInMsg;
   
-  debug_str("Drsp");
+  //char msgStr[30];
+  //sprintf(msgStr,"|cID %d s %d|",defaultRspCmd->commandID,defaultRspCmd->statusCode);
+  //debug_str(msgStr);
+  SerialCommandProcessStatus(1);
 
   return ( TRUE );
 }
