@@ -144,6 +144,19 @@ class MqttMananagement:
 
                 except:
                     print sys.exc_info()
+            elif record_temp['CMDNAME'] == "WREGGEKKO":
+                print "Write Gekko register"
+                try:
+                    messageTemp = json.loads(msg.payload)
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+                try:
+                    sp_message = "WREGGEKKO %d %d %d %d %d" % (
+                    messageTemp['EP'] ,messageTemp['ADDRTYPE'], messageTemp['ADDR'], messageTemp['REGADDR'], messageTemp['VALUE'])
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                except:
+                    print sys.exc_info()
 
 
                 #send read attribute follow onoff to condfirm value was change.

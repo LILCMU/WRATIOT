@@ -102,14 +102,15 @@ class SerialProcess:
                 #print i
                 packet_fromGateway = self.ByteCodeInterpreter.interpretByteCodeToPacket(i)
                 print packet_fromGateway
-                if packet_fromGateway['CMD'] == 8:
-                    print "set event"
-                    time.sleep(0.1)
-                    self.StringToHardwareGateway_event.set()
-                    print "event set get cmd 8"
-                else:
-                    self.mqttManagementIns.putMessageToQueue(packet_fromGateway)
-                    #print "get another response : " + str(packet_fromGateway)
+                if packet_fromGateway.has_key('CMD'):
+                    if packet_fromGateway['CMD'] == 8:
+                        print "set event"
+                        time.sleep(0.1)
+                        self.StringToHardwareGateway_event.set()
+                        print "event set get cmd 8"
+                    else:
+                        self.mqttManagementIns.putMessageToQueue(packet_fromGateway)
+                        #print "get another response : " + str(packet_fromGateway)
 
 
             _cmdList = []
