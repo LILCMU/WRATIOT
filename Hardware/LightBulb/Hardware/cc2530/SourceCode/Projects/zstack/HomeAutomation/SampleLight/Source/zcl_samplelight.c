@@ -113,6 +113,10 @@
  #include "Localization_ZigBee.h"
 #endif
 
+#if defined(LIL_HOPHER)
+ #include "LILCustomizeCC2530Board.h"
+#endif
+
 /*********************************************************************
  * MACROS
  */
@@ -606,10 +610,15 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
       
       //debug_str("reachtog");
       
-      HalLedSet (HAL_LED_2, HAL_LED_MODE_TOGGLE);
+#if defined(LIL_HOPHER)
+      beepLogoChip();
+#endif
+      
+      //HalLedSet (HAL_LED_2, HAL_LED_MODE_TOGGLE);
+      HalLedSet (HAL_LED_1, HAL_LED_MODE_TOGGLE);
     }else if(HAL_PUSH_BUTTON1()==1 && LIL_HOPHER_HOLDKEY_COUNTER>=timer_count1){
       //release button after reach timer_count1 times
-      HalLedSet (HAL_LED_2, HAL_LED_MODE_ON);
+      HalLedSet (HAL_LED_1, HAL_LED_MODE_ON);
       LIL_HOPHER_HOLDKEY_COUNTER = 0;
       
       //debug_str("release");

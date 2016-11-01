@@ -1481,16 +1481,16 @@
           <state>ZCL_DIAGNOSTIC</state>
           <state>FEATURE_SYSTEM_STATS</state>
           <state>xHAL_PA_LNA</state>
-          <state>xLIL_HOPHER</state>
+          <state>LIL_HOPHER</state>
           <state>xLIL_HOPHER_RESET_BUTTON</state>
           <state>xISR_KEYINTERRUPT</state>
           <state>LIL_HOPHER_HOLDKEY_1_RESET</state>
           <state>ZCL_REPORT</state>
           <state>GEKKO_REPORT</state>
           <state>ZIGBEE_WRITE_REGISTER_GEKKO</state>
-          <state>LOCALIZATION_ZIGBEE</state>
+          <state>xLOCALIZATION_ZIGBEE</state>
           <state>xLOCALIZATION_NODE_REPORT</state>
-          <state>LOCALIZATION_ROUTER_REPORT</state>
+          <state>xLOCALIZATION_ROUTER_REPORT</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -4846,6 +4846,12 @@
   </group>
   <group>
     <name>LogoChip</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LILCustomizeCC2530Board.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LILCustomizeCC2530Board.h</name>
+    </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\Localization_ZigBee.c</name>
     </file>
