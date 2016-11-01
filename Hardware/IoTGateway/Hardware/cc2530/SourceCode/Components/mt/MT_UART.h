@@ -125,6 +125,8 @@ void SimpleDescriptorQuery ( uint16 nwkid , uint8 ep );
 //tell serial queue in python to send another command
 void SerialCommandProcessStatus( uint8 status );
 
+//tell serial queue in python to send another command
+//void SerialCommandProcessStatusWithExtension( uint8 status , uint8 ep , uint16 addr , uint16 clusterid , );
 
 
 /*

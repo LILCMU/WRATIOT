@@ -69,7 +69,15 @@ extern "C"
 #define SAMPLELIGHT_START_EZMODE_EVT         0x0040  
 
 #if defined(LIL_HOPHER_HOLDKEY_1_RESET)
-  #define SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT   0x0060
+  #define SAMPLELIGHT_HOLDKEY_RESETCHECK_EVT   0x0080
+#endif
+   
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+  #define SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT   0x0100
+#endif
+  
+#if defined(ZCL_REPORT) && defined(LOCALIZATION_NODE_REPORT)
+  #define SAMPLELIGHT_LOCALIZATION_REPORT_REGISTER_EVT   0x0200
 #endif
 
 // Application Display Modes
@@ -83,6 +91,13 @@ extern "C"
  * TYPEDEFS
  */
 
+#if defined(ZCL_REPORT) && defined(LOCALIZATION_NODE_REPORT)
+  typedef struct{
+    ZLongAddr_t eMacAddr;
+    uint8 uuid_app[10];
+  }rssi_broadCast_Data_t;
+#endif
+  
 /*********************************************************************
  * VARIABLES
  */
@@ -112,6 +127,10 @@ extern uint8  zclSampleLight_LevelOnLevel;
 extern uint16 zclSampleLight_LevelOnTransitionTime;
 extern uint16 zclSampleLight_LevelOffTransitionTime;
 extern uint8  zclSampleLight_LevelDefaultMoveRate;
+#endif
+
+#if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
+ extern uint8 LogoChipRegister[32];
 #endif
 
 /*********************************************************************

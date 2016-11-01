@@ -4070,6 +4070,18 @@
   <group>
     <name>LogoChip</name>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LILCustomizeCC2530Board.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LILCustomizeCC2530Board.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\Localization_ZigBee.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\Localization_ZigBee.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LogoChipCommunication.c</name>
     </file>
     <file>

@@ -107,6 +107,7 @@
 #include "string.h"
 #include "MT_UART.h"
 #include "stdio.h"
+#include "ZDSecMgr.h"
 
 /*********************************************************************
  * MACROS
@@ -242,6 +243,11 @@ static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg );
 #ifdef ZCL_WRITE
 static uint8 zclSampleLight_ProcessInWriteRspCmd( zclIncomingMsg_t *pInMsg );
 #endif
+
+#ifdef ZCL_REPORT
+static uint8 zclSampleLight_ProcessInReportCmd( zclIncomingMsg_t *pInMsg );
+#endif
+
 static uint8 zclSampleLight_ProcessInDefaultRspCmd( zclIncomingMsg_t *pInMsg );
 #ifdef ZCL_DISCOVER
 static uint8 zclSampleLight_ProcessInDiscCmdsRspCmd( zclIncomingMsg_t *pInMsg );
@@ -410,6 +416,10 @@ void zclSampleLight_Init( byte task_id )
   */
 #if defined(HAL_PA_LNA) /* && defined(LIL_HOPHER) */
   ZMacSetTransmitPower(TX_PWR_PLUS_19);
+#endif
+  
+#if defined(START_WITH_PERMITJOIN_0) 
+  ZDSecMgrPermitJoining(0);
 #endif
   
   /* HeartBeat LED For Hopher.
@@ -1467,7 +1477,7 @@ static void zclSampleLight_ProcessIncomingMsg( zclIncomingMsg_t *pInMsg )
       break;
 
     case ZCL_CMD_REPORT:
-      // zclSampleLight_ProcessInReportCmd( pInMsg );
+      zclSampleLight_ProcessInReportCmd( pInMsg );
       break;
 #endif
     case ZCL_CMD_DEFAULT_RSP:
@@ -1554,11 +1564,51 @@ static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
     }
   default:
     {
+      
+      /*
       char *msgPrint;
       msgPrint = osal_mem_alloc( sizeof(char)*15 );
       sprintf(msgPrint,"GGGG");
       HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
       osal_mem_free( msgPrint );
+      */
+      
+      char *msgPrint;
+      //msgPrint = osal_mem_alloc( 30 );
+      
+      
+      uint8 *SrtAddr;
+      uint8 *Cmd;
+      uint8 *ClusterId;
+      uint8 *AttrId;
+      uint8 *dataLenght_byte_ptr;
+      uint16 dataLenght_byte = zclGetAttrDataLength(readRspCmd->attrList[0].dataType,readRspCmd->attrList[0].data);
+      SrtAddr = intToByteArray((uint16)pInMsg->srcAddr.addr.shortAddr ,2);
+      Cmd = intToByteArray(2,2);
+      ClusterId = intToByteArray((uint16)pInMsg->clusterId ,2);
+      AttrId = intToByteArray((uint16)readRspCmd->attrList[0].attrID ,2);
+      dataLenght_byte_ptr = intToByteArray((uint16)dataLenght_byte ,2);
+      //debug_str("here");
+      uint8 packetLength = 10 + (uint8)dataLenght_byte;
+      
+      msgPrint = osal_mem_alloc( packetLength+6 );
+      
+      sprintf(msgPrint,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),packetLength,*SrtAddr,*(SrtAddr+1), (uint8) pInMsg->srcAddr.endPoint , *ClusterId,*(ClusterId+1) , *AttrId,*(AttrId+1)  , readRspCmd->attrList[0].dataType , *dataLenght_byte_ptr , *(dataLenght_byte_ptr+1) );
+      if(dataLenght_byte>0){
+        memcpy(msgPrint+15,readRspCmd->attrList[0].data,(uint8)dataLenght_byte);
+      }
+      HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, packetLength+5);
+      //sprintf(msgPrint,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),9,*SrtAddr,*(SrtAddr+1), (uint8) pInMsg->srcAddr.endPoint , *ClusterId,*(ClusterId+1) , *AttrId,*(AttrId+1)  , readRspCmd->attrList[0].dataType , *((uint8 *) readRspCmd->attrList[0].data) );
+      //HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, 14);
+      osal_mem_free(SrtAddr);
+      osal_mem_free(Cmd);
+      osal_mem_free(ClusterId);
+      osal_mem_free(AttrId);
+      osal_mem_free(dataLenght_byte_ptr);
+      osal_mem_free( msgPrint );
+      
+      break;
+      
       
     }
     
@@ -1580,7 +1630,7 @@ static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
   */
 
   
-  
+  SerialCommandProcessStatus(1);
 
   return ( TRUE );
 }
@@ -1612,6 +1662,63 @@ static uint8 zclSampleLight_ProcessInWriteRspCmd( zclIncomingMsg_t *pInMsg )
 }
 #endif // ZCL_WRITE
 
+#ifdef ZCL_REPORT
+static uint8 zclSampleLight_ProcessInReportCmd( zclIncomingMsg_t *pInMsg ){
+  
+  
+  
+  zclReportCmd_t *reportRsp;
+  reportRsp = (zclReportCmd_t *) pInMsg->attrCmd;
+    
+  switch(pInMsg->clusterId){
+#ifdef GEKKO_REPORT
+  case ZCL_CLUSTER_ID_LIL_GEKKO:
+    {
+      char msgStr[44];
+      //sprintf(msgStr,"rp %d %d %d %d %d %x %x",pInMsg->endPoint,reportRsp->numAttr,*(reportRsp->attrList[0].attrData),*(reportRsp->attrList[1].attrData),*(reportRsp->attrList[2].attrData),pInMsg->srcAddr.addr.shortAddr,pInMsg->clusterId);
+      //debug_str(msgStr);
+      
+      uint8 *SrtAddr;
+      uint8 *Cmd;
+      uint8 *ClusterId;
+      //uint8 *AttrId;
+      SrtAddr = intToByteArray((uint16)pInMsg->srcAddr.addr.shortAddr ,2);
+      Cmd = intToByteArray(9,2);
+      ClusterId = intToByteArray((uint16)pInMsg->clusterId ,2);
+      
+      //AttrId = intToByteArray((uint16)readRspCmd->attrList[0].attrID ,2);
+      sprintf(msgStr,"%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),38,*SrtAddr,*(SrtAddr+1),pInMsg->endPoint
+              ,*ClusterId,*(ClusterId+1),reportRsp->numAttr);
+      
+      for(uint8 i = 0;i<reportRsp->numAttr;i++){
+      
+        memcpy(msgStr+11+i,reportRsp->attrList[i].attrData,1);
+        
+      }
+      
+      HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 43);
+      osal_mem_free(SrtAddr);
+      osal_mem_free(Cmd);
+      osal_mem_free(ClusterId);
+      //osal_mem_free(AttrId);
+      
+      break;
+    }
+#endif
+  default:
+    {
+     break;
+    }
+  }
+  
+  
+  return ( TRUE );
+  
+  
+}
+#endif
+
+
 /*********************************************************************
  * @fn      zclSampleLight_ProcessInDefaultRspCmd
  *
@@ -1623,10 +1730,15 @@ static uint8 zclSampleLight_ProcessInWriteRspCmd( zclIncomingMsg_t *pInMsg )
  */
 static uint8 zclSampleLight_ProcessInDefaultRspCmd( zclIncomingMsg_t *pInMsg )
 {
-  // zclDefaultRspCmd_t *defaultRspCmd = (zclDefaultRspCmd_t *)pInMsg->attrCmd;
+  //zclDefaultRspCmd_t *defaultRspCmd = (zclDefaultRspCmd_t *)pInMsg->attrCmd;
 
   // Device is notified of the Default Response command.
   (void)pInMsg;
+  
+  //char msgStr[30];
+  //sprintf(msgStr,"|cID %d s %d|",defaultRspCmd->commandID,defaultRspCmd->statusCode);
+  //debug_str(msgStr);
+  SerialCommandProcessStatus(1);
 
   return ( TRUE );
 }

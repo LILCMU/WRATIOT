@@ -46,6 +46,10 @@
 #include "MT.h"
 #include "MT_UART.h"
 #include "OSAL_Memory.h"
+   
+#include "DebugTrace.h"
+#include "string.h"
+#include "stdio.h"
 
 
 /***************************************************************************************************
@@ -81,6 +85,8 @@ uint8  tempDataLen;
 uint16  MT_UartMaxZAppBufLen;
 bool    MT_UartZAppRxStatus;
 #endif
+
+uint8 LogoChipRegister[32];
 
 
 /***************************************************************************************************
@@ -184,24 +190,115 @@ void uartHandleCommand( uint8 port, uint8 event ){
 //    HalUARTWrite(port, bufferInRx+i, 1);
 //  }
   
+  uint8 buffer_one_byte;
+  uint8 packetCount;
+  uint8 *packet;
   
-  
-  switch(event) {
-   case HAL_UART_RX_FULL:
-     break;
-   case HAL_UART_RX_ABOUT_FULL:
-     break;
-   case HAL_UART_RX_TIMEOUT:
+  //switch(event) {
+  // case HAL_UART_RX_FULL:
+  //   HalUARTRead (port, &buffer_one_byte, 1);
+  //   HalUARTWrite(port, &buffer_one_byte, 1);
+  //   debug_str("uartfull");
+  //   break;
+  // case HAL_UART_RX_ABOUT_FULL:
+  //   debug_str("aboutfull");
+  //   break;
+  // case HAL_UART_RX_TIMEOUT:
      
+  if (event & ( HAL_UART_RX_FULL | HAL_UART_RX_ABOUT_FULL | HAL_UART_RX_TIMEOUT)){
+       
+      while( Hal_UART_RxBufLen(port) ){
+          HalUARTRead (port, &buffer_one_byte, 1);
+          //debug_str(&buffer_one_byte);
+          //HalUARTWrite(port, &buffer_one_byte, 1);
+          if(buffer_one_byte==0x54){
+            HalUARTRead (port, &buffer_one_byte, 1);
+            
+            if(buffer_one_byte==0xfe){
+              HalUARTRead (port, &packetCount, 1);
+              packet = osal_mem_alloc(packetCount);
+              HalUARTRead (port, packet, packetCount);
+              if(packet[0]==GEKKOPACKETTYPE){
+                for(uint8 i=0 ; i<LOGOCHIPREGISTERSIZE ; i++){
+                  LogoChipRegister[i] = packet[i];
+                }
+              }
+              osal_mem_free(packet);
+            }
+            
+          }
+       }
+      
+      //uint8 msgg[20];
+      //sprintf(msgg,"hr %d %d ",LogoChipRegister[1],LogoChipRegister[2]);
+      //debug_str(msgg);
+       
+  }
+       
+    /*   
     uint8  *bufferInRx;
     uint16 countByteInRxBuffer = Hal_UART_RxBufLen(port);
     bufferInRx = osal_mem_alloc(countByteInRxBuffer);
     HalUARTRead (port, bufferInRx, countByteInRxBuffer);
-  
     
-    for(uint8 i = 0;*(bufferInRx+i)!='\n';i++){
-      HalUARTWrite(port, bufferInRx+i, 1);
+    // 0 = not found, 1 = found 0x54 , 2 = found 0x54 and 0xfe , 3 = assign packet size
+    uint8 foundHeader = 0;
+    uint8 byteInPacket = 0;
+    uint8 countRegister = 0;
+    uint8 packetType = 0; 
+    
+    //char debugGG[50];
+    
+    //test
+    
+    //for( uint8 i = 0 ; i<LOGOCHIPREGISTERSIZE ; i++ ){
+      
+    //  LogoChipRegister[i] = i;
+      
+    //}
+    
+    
+    
+    for( uint8 i = 0 ; i<countByteInRxBuffer ; i++ ){
+      
+      
+        if( *(bufferInRx+i) == 0x54 && foundHeader == 0 ){
+          foundHeader = 1;
+        }else if( *(bufferInRx+i) == 0xfe && foundHeader == 1 ){
+          foundHeader = 2;
+        }else if( foundHeader == 2 && byteInPacket == 0 ){
+          byteInPacket = *(bufferInRx+i);
+          //first data in packet is Packet type.
+          packetType = *(bufferInRx+i+1);
+          foundHeader = 3;
+        }else if( foundHeader == 3 && byteInPacket > 0){
+          if(countRegister<LOGOCHIPREGISTERSIZE && packetType == GEKKOPACKETTYPE){
+            LogoChipRegister[countRegister] = *(bufferInRx+i);
+            countRegister++;
+          }
+          //sprintf(debugGG,"c:%d b:%d v:%d\n",countRegister,byteInPacket,LogoChipRegister[countRegister]);
+          //HalUARTWrite(MT_UART_DEFAULT_PORT, debugGG, 40);
+          //debug_str(debugGG);
+          
+          //countRegister++;
+          byteInPacket--;
+          
+        }else{
+          foundHeader = 0;
+          byteInPacket = 0;
+          countRegister = 0;
+          packetType = 0;
+        }
+        
+        
+      //HalUARTWrite(port, bufferInRx+i, 1);
     }
+    
+    
+    //for(uint8 i = 0;*(bufferInRx+i)!='\n';i++){
+    //  HalUARTWrite(port, bufferInRx+i, 1);
+    //}
+    
      
 //     if(*(bufferInRx+1)=='\r'){
 //      HalUARTWrite(port, bufferInRx+0, 1);
@@ -210,13 +307,29 @@ void uartHandleCommand( uint8 port, uint8 event ){
 //        debug_str("in there");
 //      }
     osal_mem_free(bufferInRx);
-    
-   break;
-  }
+    */
+       
+  // break;
    
+  //}
+  
+  //osal_mem_free(buffer_one_byte);
+   
+  //osal_mem_free(packetCount);
   
   
+}
+
+uint8 checkSumGekko( uint8 *arr , uint8 arrLen ){
   
+  uint8 i = 0;
+  uint16 value = 0;
+  for(i=0;i<arrLen;i++){
+    value += arr[i];
+    value %=256;
+  }
+  return (uint8) value;
+
 }
 
 /***************************************************************************************************

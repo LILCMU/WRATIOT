@@ -1471,7 +1471,6 @@
           <state>MULTICAST_ENABLED=FALSE</state>
           <state>ZCL_READ</state>
           <state>ZCL_WRITE</state>
-          <state>ZCL_REPORT</state>
           <state>ZCL_EZMODE</state>
           <state>ZCL_BASIC</state>
           <state>ZCL_IDENTIFY</state>
@@ -1481,13 +1480,17 @@
           <state>xZCL_LEVEL_CTRL</state>
           <state>ZCL_DIAGNOSTIC</state>
           <state>FEATURE_SYSTEM_STATS</state>
-          <state>MT_UART_DEFAULT_MAX_TX_BUFF=200</state>
-          <state>MT_UART_DEFAULT_MAX_RX_BUFF=200</state>
-          <state>HAL_PA_LNA</state>
-          <state>xLIL_HOPHER</state>
+          <state>xHAL_PA_LNA</state>
+          <state>LIL_HOPHER</state>
           <state>xLIL_HOPHER_RESET_BUTTON</state>
           <state>xISR_KEYINTERRUPT</state>
           <state>LIL_HOPHER_HOLDKEY_1_RESET</state>
+          <state>ZCL_REPORT</state>
+          <state>GEKKO_REPORT</state>
+          <state>ZIGBEE_WRITE_REGISTER_GEKKO</state>
+          <state>xLOCALIZATION_ZIGBEE</state>
+          <state>xLOCALIZATION_NODE_REPORT</state>
+          <state>xLOCALIZATION_ROUTER_REPORT</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -1677,6 +1680,7 @@
           <state>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac\f8w</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -2134,24 +2138,24 @@
         </option>
         <option>
           <name>AllowExtraOutput</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>GenerateExtraOutput</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>XExtraOutOverride</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>ExtraOutputFile</name>
-          <state>SampleLight.sim</state>
+          <state>SampleLight.hex</state>
         </option>
         <option>
           <name>ExtraOutputFormat</name>
           <version>11</version>
-          <state>60</state>
+          <state>23</state>
         </option>
         <option>
           <name>ExtraFormatVariant</name>
@@ -2622,8 +2626,8 @@
           <state>SECURE=1</state>
           <state>TC_LINKKEY_JOIN</state>
           <state>NV_INIT</state>
-          <state>xNV_RESTORE</state>
-          <state>POWER_SAVING</state>
+          <state>NV_RESTORE</state>
+          <state>xPOWER_SAVING</state>
           <state>NWK_AUTO_POLL</state>
           <state>xHOLD_AUTO_START</state>
           <state>ZTOOL_P1</state>
@@ -2645,6 +2649,16 @@
           <state>xZCL_LEVEL_CTRL</state>
           <state>ZCL_DIAGNOSTIC</state>
           <state>FEATURE_SYSTEM_STATS</state>
+          <state>xHAL_PA_LNA</state>
+          <state>LIL_HOPHER</state>
+          <state>xLIL_HOPHER_RESET_BUTTON</state>
+          <state>xISR_KEYINTERRUPT</state>
+          <state>LIL_HOPHER_HOLDKEY_1_RESET</state>
+          <state>GEKKO_REPORT</state>
+          <state>ZIGBEE_WRITE_REGISTER_GEKKO</state>
+          <state>LOCALIZATION_ZIGBEE</state>
+          <state>LOCALIZATION_NODE_REPORT</state>
+          <state>xLOCALIZATION_ROUTER_REPORT</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -2834,6 +2848,7 @@
           <state>$PROJ_DIR$\..\..\..\..\..\Components\stack\zdo</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac</state>
           <state>$PROJ_DIR$\..\..\..\..\..\Components\zmac\f8w</state>
+          <state>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -4832,10 +4847,30 @@
   <group>
     <name>LogoChip</name>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LILCustomizeCC2530Board.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LILCustomizeCC2530Board.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\Localization_ZigBee.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\Localization_ZigBee.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LogoChipCommunication.c</name>
+      <excluded>
+        <configuration>RouterEB</configuration>
+        <configuration>EndDeviceEB</configuration>
+      </excluded>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\..\..\..\..\LogoChip\LogoChipCommunication.h</name>
+      <excluded>
+        <configuration>RouterEB</configuration>
+        <configuration>EndDeviceEB</configuration>
+      </excluded>
     </file>
   </group>
   <group>

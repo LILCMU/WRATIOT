@@ -4529,6 +4529,12 @@
       <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_closures.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_closures.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_diagnostic.c</name>
     </file>
     <file>

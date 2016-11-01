@@ -43,6 +43,31 @@ class ByteCodeZigBee:
                     packet_temp['DATA'] = ord(bc[13])
 
                 else:
+                    packet_temp['DATA_LENGTH'] = struct.unpack('>I', bytearray([0, 0, ord(bc[13]), ord(bc[14])]))[0]
+                    # uint8
+                    if packet_temp['DATA_TYPE'] == 0x20:
+                        packet_temp['DATA'] = ord(bc[15])
+                    # 32-bit BitMap
+                    elif packet_temp['DATA_TYPE'] == 0x1b:
+                        packet_temp['DATA'] = bin(struct.unpack('>I', bytearray([ord(bc[15]), ord(bc[16]) , ord(bc[17]), ord(bc[18])]))[0])
+                        print str(ord(bc[15]))
+                        print str(ord(bc[16]))
+                        print str(ord(bc[17]))
+                        print str(ord(bc[18]))
+                    # Signed 16-bit integer
+                    elif packet_temp['DATA_TYPE'] == 0x29:
+                        packet_temp['DATA'] = struct.unpack('<h', bytearray([ord(bc[15]), ord(bc[16])]))[0]
+                    # Unsigned 16-bit integer
+                    elif packet_temp['DATA_TYPE'] == 0x21:
+                        packet_temp['DATA'] = struct.unpack('<H', bytearray([ord(bc[15]), ord(bc[16])]))[0]
+                    # 8-bit enumeration
+                    elif packet_temp['DATA_TYPE'] == 0x30:
+                        packet_temp['DATA'] = ord(bc[15])
+                    # character String,first byte is size of string
+                    elif packet_temp['DATA_TYPE'] == 0x42:
+                        packet_temp['DATA'] = ''
+                        for i in range(0,packet_temp['DATA_LENGTH']-1):
+                            packet_temp['DATA'] +=  bc[16+i]
                     self.ByteCodeZigBee_logging.debug("NO DATA MATCHING")
             elif cmd_pack == 3:
                 packet_temp['CMD'] = 3
@@ -97,6 +122,28 @@ class ByteCodeZigBee:
             elif cmd_pack == 8:
                 packet_temp['CMD'] = 8
                 packet_temp['STATUS'] = ord(bc[5])
+            elif cmd_pack == 9:
+                packet_temp['CMD'] = 9
+                packet_temp['SRC_ADDR'] = struct.unpack('>I', bytearray([0, 0, ord(bc[5]), ord(bc[6])]))[0]
+                packet_temp['EP'] = ord(bc[7])
+                packet_temp['CLUSTER_ID'] = struct.unpack('>I', bytearray([0, 0, ord(bc[8]), ord(bc[9])]))[0]
+                #check cluster id (64513 is customize cluster for GEKKO)
+                if packet_temp['CLUSTER_ID'] == 64513:
+                    packet_temp['REGISTER_COUNT'] = ord(bc[10])
+                    packet_temp['LOGO_PACKET_TYPE'] = ord(bc[11])
+                    packet_temp['REGISTERS'] = []
+                    for i in range(0,packet_temp['REGISTER_COUNT']):
+                        packet_temp['REGISTERS'].append(ord(bc[11+i]))
+                    #separate packet type
+                    if packet_temp['LOGO_PACKET_TYPE'] == 0:
+                        packet_temp['SENSOR1'] = struct.unpack('>I', bytearray([0, 0, ord(bc[12]), ord(bc[13])]))[0]
+                    #for hotel system (GEKKO)
+                    elif packet_temp['LOGO_PACKET_TYPE'] == 11:
+                        packet_temp['IR_MANUAL_ON_COUNTER'] = ord(bc[12])
+                        packet_temp['IR_MANUAL_OFF_COUNTER'] = ord(bc[13])
+                        packet_temp['IR_HOUSEKEEPING_ON_COUNTER'] = ord(bc[14])
+                        packet_temp['IR_HOUSEKEEPING_OFF_COUNTER'] = ord(bc[15])
+
 
         else:
             self.ByteCodeZigBee_logging.debug("BAD HEADER")

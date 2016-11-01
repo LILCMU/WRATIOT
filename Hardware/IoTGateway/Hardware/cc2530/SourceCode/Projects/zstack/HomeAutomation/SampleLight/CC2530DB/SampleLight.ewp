@@ -321,6 +321,8 @@
           <state>ZCL_BASIC</state>
           <state>ZCL_IDENTIFY</state>
           <state>ZCL_ON_OFF</state>
+          <state>ZCL_DOORLOCK</state>
+          <state>ZCL_REPORT</state>
           <state>ZCL_SCENES</state>
           <state>ZCL_GROUPS</state>
           <state>xZCL_LEVEL_CTRL</state>
@@ -331,6 +333,8 @@
           <state>xLIL_HOPHER</state>
           <state>xHEARTBEAT_LED_USB_DONGLE</state>
           <state>HEARTBEAT_LED_WAVESHARE</state>
+          <state>START_WITH_PERMITJOIN_0</state>
+          <state>GEKKO_REPORT</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -977,24 +981,24 @@
         </option>
         <option>
           <name>AllowExtraOutput</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>GenerateExtraOutput</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>XExtraOutOverride</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>ExtraOutputFile</name>
-          <state>SampleLight.sim</state>
+          <state>SampleLight.hex</state>
         </option>
         <option>
           <name>ExtraOutputFormat</name>
           <version>11</version>
-          <state>60</state>
+          <state>23</state>
         </option>
         <option>
           <name>ExtraFormatVariant</name>
@@ -5291,6 +5295,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_closures.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_closures.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\..\Components\stack\zcl\zcl_diagnostic.c</name>
