@@ -441,8 +441,10 @@ void uartHandleCommand( uint8 port, uint8 event ){
         
         }
         
+#if defined(GEKKO_SEND_CUSTOM_COMMAND)
         else if(!strcmp(args[0],"SENDCMD")){
           
+          /*
           afAddrType_t addr;
           uint8 *payload_temp;
           payload_temp = osal_mem_alloc((uint16)atoi(args[6]));
@@ -455,6 +457,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
               addr.addrMode = (afAddrMode_t)AddrBroadcast;
             }
           addr.addr.shortAddr = (uint16)atoi(args[3]);
+          */
           
           /* arg4 = cluster id
            * arg5 = command id
@@ -462,6 +465,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
            * arg7 = payload data (not available now until convert all to byte code)
            */
           
+          /*
           memcpy(payload_temp,args[7],(uint16)atoi(args[6]));
           zcl_SendCommand( 8 , &addr , (uint16)atoi(args[4]) ,
                             (uint16)atoi(args[5]) , TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
@@ -470,8 +474,11 @@ void uartHandleCommand( uint8 port, uint8 event ){
           //HalUARTWrite(MT_UART_DEFAULT_PORT, args[7] , 10);
           
           osal_mem_free(payload_temp);
-        
+          */
+          GekkoSendCustomCommand(args[1]);
+          
         }
+#endif
         
         else if(!strcmp(args[0],"DLOCKADDUSER")){
           
@@ -663,6 +670,87 @@ void uartHandleCommand( uint8 port, uint8 event ){
   */
   
 }
+
+#if defined(GEKKO_SEND_CUSTOM_COMMAND)
+void GekkoSendCustomCommand( uint8 *contentData ){
+
+  char msg[50];
+  afAddrType_t addr;
+  uint16 clusterId;
+  uint8 cmdId;
+  uint8 payloadLength;
+  uint8 *payloadPtr;
+  uint8 i=0;
+  uint8 countHexTemp;
+  char temp1[2];
+  char temp2[2];
+  char temp3[2];
+  char temp4[2];
+  
+  temp1[0] = contentData[0];
+  temp2[0] = contentData[1];
+  addr.endPoint = (uint8) ( ((uint8)strtoul(temp1,NULL,16)<<4) + ((uint8)strtoul(temp2,NULL,16)) );
+  
+  temp1[0] = contentData[2];
+  if( ((uint8)strtoul(temp1,NULL,16)) == 0){
+      addr.addrMode = (afAddrMode_t)Addr16Bit;
+    }else if(atoi(args[2]) == 1){
+      addr.addrMode = (afAddrMode_t)AddrGroup;
+    }else{
+      addr.addrMode = (afAddrMode_t)AddrBroadcast;
+    }
+  
+  temp1[0] = contentData[3];
+  temp2[0] = contentData[4];
+  temp3[0] = contentData[5];
+  temp4[0] = contentData[6];
+  addr.addr.shortAddr = (uint16) ( (strtoul(temp1,NULL,16)<<12) + (strtoul(temp2,NULL,16)<<8) + (strtoul(temp3,NULL,16)<<4) + (strtoul(temp4,NULL,16))  ) ;
+  
+  temp1[0] = contentData[7];
+  temp2[0] = contentData[8];
+  temp3[0] = contentData[9];
+  temp4[0] = contentData[10];
+  clusterId = (uint16) ( (strtoul(temp1,NULL,16)<<12) + (strtoul(temp2,NULL,16)<<8) + (strtoul(temp3,NULL,16)<<4) + (strtoul(temp4,NULL,16))  ) ;
+  
+  temp1[0] = contentData[11];
+  temp2[0] = contentData[12];
+  cmdId = (uint8) ( ((uint8)strtoul(temp1,NULL,16)<<4) + ((uint8)strtoul(temp2,NULL,16)) );
+  
+  temp1[0] = contentData[13];
+  temp2[0] = contentData[14];
+  payloadLength = (uint8) ( ((uint8)strtoul(temp1,NULL,16)<<4) + ((uint8)strtoul(temp2,NULL,16)) );
+  payloadPtr = osal_mem_alloc((uint16)payloadLength);
+  
+  countHexTemp = 0;
+  
+  for(i=0;i<payloadLength;i++){
+    
+    
+    temp1[0] = contentData[15+countHexTemp];
+    temp2[0] = contentData[16+countHexTemp];
+    payloadPtr[i] = (uint8) ( ((uint8)strtoul(temp1,NULL,16)<<4) + ((uint8)strtoul(temp2,NULL,16)) );
+    countHexTemp+=2;
+    
+  }
+  
+  
+  sprintf(msg," %d %x %x %x %x | %x %x ",addr.endPoint,addr.addr.shortAddr, clusterId, cmdId ,payloadLength ,payloadPtr[0] ,payloadPtr[1] );
+  debug_str(msg);
+  
+  zcl_SendCommand( 8 , &addr , clusterId ,
+                            cmdId , TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
+                            FALSE , 0, 0, payloadLength, payloadPtr );
+  
+  /*
+  zcl_SendCommand( 8 , &addr , ,
+                            0x50, TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
+                            FALSE , 0, 0, 2, payload_temp );
+  */
+  
+  osal_mem_free(payloadPtr);
+  
+}
+#endif
 
 void testWriteNV( void ){
 

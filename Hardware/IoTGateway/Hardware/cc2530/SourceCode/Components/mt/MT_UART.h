@@ -128,6 +128,10 @@ void SerialCommandProcessStatus( uint8 status );
 //tell serial queue in python to send another command
 //void SerialCommandProcessStatusWithExtension( uint8 status , uint8 ep , uint16 addr , uint16 clusterid , );
 
+#if defined(GEKKO_SEND_CUSTOM_COMMAND)
+void GekkoSendCustomCommand( uint8 *contentData );
+#endif
+
 
 /*
  * Initialization
