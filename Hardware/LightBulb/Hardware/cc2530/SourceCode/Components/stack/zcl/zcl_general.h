@@ -355,6 +355,10 @@ extern "C"
 #ifdef ZIGBEE_WRITE_REGISTER_GEKKO
    #define COMMAND_ZIGBEE_WRITE_REGISTER_GEKKO            0x50
 #endif
+  
+#ifdef GEKKO_RECEIVE_LOGO_CODE_COMMAND
+   #define COMMAND_GEKKO_RECEIVE_LOGO_CODE                0x51
+#endif
 
 /*** Values of 'effect identifier' field of 'off with effect' command  ***/
 #define EFFECT_ID_DELAY_ALL_OFF                           0x00
@@ -1422,6 +1426,9 @@ typedef struct
   zclGCB_OnOff_OnWithTimedOff_t     pfnOnOff_OnWithTimedOff;      // On/Off cluster enhanced command On with Timed Off
 #ifdef ZIGBEE_WRITE_REGISTER_GEKKO
   zclGCB_OnOff_t                    pfnOnOff_ZigBee_Write_Register_Gekko;                     // On/Off cluster commands
+#endif
+#ifdef GEKKO_RECEIVE_LOGO_CODE_COMMAND
+  zclGCB_OnOff_t                    pfnOnOff_Gekko_Receive_Logo_Code;                     // On/Off cluster commands
 #endif
 #ifdef ZCL_LEVEL_CTRL
   zclGCB_LevelControlMoveToLevel_t  pfnLevelControlMoveToLevel;   // Level Control Move to Level command

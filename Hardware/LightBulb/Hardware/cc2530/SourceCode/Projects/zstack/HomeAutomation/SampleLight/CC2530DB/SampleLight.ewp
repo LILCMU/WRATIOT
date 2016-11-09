@@ -1491,6 +1491,7 @@
           <state>xLOCALIZATION_ZIGBEE</state>
           <state>xLOCALIZATION_NODE_REPORT</state>
           <state>xLOCALIZATION_ROUTER_REPORT</state>
+          <state>GEKKO_RECEIVE_LOGO_CODE_COMMAND</state>
         </option>
         <option>
           <name>CCPreprocFile</name>

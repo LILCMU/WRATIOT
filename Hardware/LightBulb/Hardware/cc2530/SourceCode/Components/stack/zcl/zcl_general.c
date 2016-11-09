@@ -3136,6 +3136,15 @@ static ZStatus_t zclGeneral_ProcessInOnOff( zclIncoming_t *pInMsg,
       break;
 #endif
       
+#ifdef GEKKO_RECEIVE_LOGO_CODE_COMMAND
+    case COMMAND_GEKKO_RECEIVE_LOGO_CODE:
+      if ( pCBs->pfnOnOff_Gekko_Receive_Logo_Code )
+      {
+        pCBs->pfnOnOff_Gekko_Receive_Logo_Code( pInMsg->hdr.commandID );
+      }
+      break;
+#endif
+      
       
       default:
         stat = ZFailure;

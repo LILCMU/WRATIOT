@@ -232,6 +232,9 @@ static void zclSampleLight_OnOffCB( uint8 cmd );
 #ifdef ZIGBEE_WRITE_REGISTER_GEKKO
   static void zclSampleLight_OnOffCB_ZigBee_Write_Register_Gekko( uint8 cmd );
 #endif
+#ifdef GEKKO_RECEIVE_LOGO_CODE_COMMAND
+  static void zclSampleLight_OnOffCB_Gekko_Receive_Logo_Code( uint8 cmd );
+#endif
 static void zclSampleLight_ProcessIdentifyTimeChange( void );
 #ifdef ZCL_LEVEL_CTRL
 static void zclSampleLight_LevelControlMoveToLevelCB( zclLCMoveToLevel_t *pCmd );
@@ -316,6 +319,9 @@ static zclGeneral_AppCallbacks_t zclSampleLight_CmdCallbacks =
   NULL,                                   // On/Off cluster enhanced command On with Timed Off
 #ifdef ZIGBEE_WRITE_REGISTER_GEKKO
   zclSampleLight_OnOffCB_ZigBee_Write_Register_Gekko,   // On/Off cluster commands
+#endif
+#ifdef GEKKO_RECEIVE_LOGO_CODE_COMMAND
+  zclSampleLight_OnOffCB_Gekko_Receive_Logo_Code,   // On/Off cluster commands
 #endif
 #ifdef ZCL_LEVEL_CTRL
   zclSampleLight_LevelControlMoveToLevelCB, // Level Control Move to Level command
@@ -1181,6 +1187,57 @@ static void zclSampleLight_OnOffCB_ZigBee_Write_Register_Gekko( uint8 cmd ){
   sprintf(msgStr+8,"%c%c%c%c%c%c%c%c",0x54,0xfe,5,set_reg_cmd[0],set_reg_cmd[1],set_reg_cmd[2],set_reg_cmd[3],checksum_set_reg);
   //debug_str("ZBWriteGekko");
   HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 16);
+  
+  
+  //uint8 msgStr[30];
+  
+  //sprintf(msgStr,"ZBWGK %d %d %d %d | %d %d",pPtr->srcAddr.addr.shortAddr,pPtr->cmd.DataLength,*(pPtr->cmd.Data+3),*(pPtr->cmd.Data+4),checksum_set_ptr,checksum_set_reg);
+  //debug_str("ZBWriteGekko");
+  //HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 30);
+  
+
+}
+#endif
+
+
+/*********************************************************************
+ * @fn      zclSampleLight_OnOffCB_Gekko_Receive_Logo_Code
+ *
+ * @brief   Callback from the ZCL General Cluster Library when
+ *          it received an On/Off Gekko Receive Logo Code Command for this application.
+ *
+ * @param   cmd - Gekko Receive Logo Code Command (This callback will get raw AFMsg from System.)
+ *
+ * @return  none
+ */
+#ifdef GEKKO_RECEIVE_LOGO_CODE_COMMAND
+static void zclSampleLight_OnOffCB_Gekko_Receive_Logo_Code( uint8 cmd ){
+
+  afIncomingMSGPacket_t *pPtr = zcl_getRawAFMsg();
+  //pPtr->cmd.Data at index 0 is reserved for TransSeqNumber.
+  //pPtr->cmd.Data at index 1,2 is reserved for DataLength.
+  //Payload data is starting at index 3.
+  uint8 i = 0;
+  
+  //char msgDebug[50];
+  //sprintf(msgDebug,"DL : %d",pPtr->cmd.DataLength);
+  //HalUARTWrite(MT_UART_DEFAULT_PORT, msgDebug , strlen(msgDebug) );
+  
+  for(i=0;i<(pPtr->cmd.DataLength-3);i++){
+    HalUARTWrite(MT_UART_DEFAULT_PORT, (pPtr->cmd.Data+3+i) , 1);
+  }
+  
+  //uint8 set_ptr_logo_mem_cmd[] = {2,1,0,*(pPtr->cmd.Data+3)};
+  //uint8 set_reg_cmd[] = {2,2,1,*(pPtr->cmd.Data+4)};
+  //uint8 checksum_set_ptr = checkSumGekko(set_ptr_cmd,4);
+  //uint8 checksum_set_reg = checkSumGekko(set_reg_cmd,4);
+  
+  
+  //uint8 msgStr[16+1];
+  //sprintf(msgStr,"%c%c%c%c%c%c%c%c",0x54,0xfe,5,set_ptr_cmd[0],set_ptr_cmd[1],set_ptr_cmd[2],set_ptr_cmd[3],checksum_set_ptr);
+  //sprintf(msgStr+8,"%c%c%c%c%c%c%c%c",0x54,0xfe,5,set_reg_cmd[0],set_reg_cmd[1],set_reg_cmd[2],set_reg_cmd[3],checksum_set_reg);
+  //debug_str("ZBWriteGekko");
+  //HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 16);
   
   
   //uint8 msgStr[30];
