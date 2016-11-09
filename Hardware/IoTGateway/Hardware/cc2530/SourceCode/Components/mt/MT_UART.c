@@ -475,6 +475,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
           
           osal_mem_free(payload_temp);
           */
+          confirmExecuteFlag = 0;
           GekkoSendCustomCommand(args[1]);
           
         }
@@ -674,7 +675,8 @@ void uartHandleCommand( uint8 port, uint8 event ){
 #if defined(GEKKO_SEND_CUSTOM_COMMAND)
 void GekkoSendCustomCommand( uint8 *contentData ){
 
-  char msg[50];
+  //char msg[50];
+  uint8 returnFlag = 1;
   afAddrType_t addr;
   uint16 clusterId;
   uint8 cmdId;
@@ -694,6 +696,7 @@ void GekkoSendCustomCommand( uint8 *contentData ){
   temp1[0] = contentData[2];
   if( ((uint8)strtoul(temp1,NULL,16)) == 0){
       addr.addrMode = (afAddrMode_t)Addr16Bit;
+      returnFlag = 0;
     }else if(atoi(args[2]) == 1){
       addr.addrMode = (afAddrMode_t)AddrGroup;
     }else{
@@ -734,8 +737,8 @@ void GekkoSendCustomCommand( uint8 *contentData ){
   }
   
   
-  sprintf(msg," %d %x %x %x %x | %x %x ",addr.endPoint,addr.addr.shortAddr, clusterId, cmdId ,payloadLength ,payloadPtr[0] ,payloadPtr[1] );
-  debug_str(msg);
+  //sprintf(msg," %d %x %x %x %x | %x %x ",addr.endPoint,addr.addr.shortAddr, clusterId, cmdId ,payloadLength ,payloadPtr[0] ,payloadPtr[1] );
+  //debug_str(msg);
   
   zcl_SendCommand( 8 , &addr , clusterId ,
                             cmdId , TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
@@ -748,6 +751,10 @@ void GekkoSendCustomCommand( uint8 *contentData ){
   */
   
   osal_mem_free(payloadPtr);
+  
+  if(returnFlag==1){
+    SerialCommandProcessStatus(1);
+  }
   
 }
 #endif
