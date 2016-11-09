@@ -4,10 +4,15 @@ import Queue
 import logging
 import time
 import ast
+import os
+import sys
 from CoreSystem.byteCodeZigBee import ByteCodeZigBee
 from simpleDemoConfig import simpleDemoConfig
 
 from CoreSystem.mqttManangement import MqttMananagement
+
+#from LogoChipCompiler.gogochipc import gogoChipC
+import LogoChipCompiler.gogochipc as gogochipc
 
 class SerialProcess:
     def __init__(self,loggingLevel=None,GatewayConfigIns=None):
@@ -128,8 +133,99 @@ class SerialProcess:
         if string_temp.count(' ') <= 10:
             #use for SENDCMD payload
             #Not complete (In Beta)
-            if len(string_temp.split()) == 8:
+            if len(string_temp.split()) > 0:
+
                 string_split_temp = string_temp.split()
+                if string_split_temp[0] == 'SENDLOGO':
+                    if len(string_split_temp) == 6:
+                        destEndpoint = "{0:0{1}x}".format(int(string_split_temp[1]), 2)
+                        destAddrType = string_split_temp[2]
+                        destAddress = "{0:0{1}x}".format(int(string_split_temp[3]),4)
+                        destClusterId = "0006"
+                        destCommandId = "51"
+                        headerPayload = destEndpoint+destAddrType+destAddress+destClusterId+destCommandId
+
+                        #Send setMemPointer to serial queue
+                        setMemPointer = [0x54, 0xfe, 5, 1, 1, 0, 0, 2]
+                        setMemPointerPayloadLength = "{0:0{1}x}".format(len(setMemPointer), 2)
+                        setMemPointerPayload = ''
+                        for i in setMemPointer:
+                            # print type(i)
+                            setMemPointerPayload += "{0:0{1}x}".format(i, 2)
+                        setMemPointerBytePacket = headerPayload+setMemPointerPayloadLength+setMemPointerPayload
+                        print "Set Logo Chip Memory Pointer"
+                        print setMemPointerBytePacket
+                        self.StringToHardwareGatewayQueue.put("SENDCMD "+setMemPointerBytePacket)
+
+
+
+
+                        #load code from file
+                        if string_split_temp[4] == '0':
+                            print "here"
+                            logoFileDirCurrent = os.path.dirname(sys.argv[0])
+                            logoFileDirCurrent = os.path.join(logoFileDirCurrent, "LogoChipCompiler/LogoCode/"+ string_split_temp[5])
+                            print logoFileDirCurrent
+                            logoString = open(logoFileDirCurrent, 'r').read()
+                            print logoString
+                            nodeList = ('light1', 'light2')
+
+
+                            #compiler = gogoChipC()
+                            compiler = gogochipc.gogoChipC()
+                            compiler.compile(logoString, nodeList)
+
+                            # retrieve the byte code for use elsewhere in your code
+                            outputByteCode = compiler.byteCode()
+                            convertByteCode = ''
+                            for i in outputByteCode:
+                                #print type(i)
+                                convertByteCode+="{0:0{1}x}".format(ord(i), 2)
+                            print convertByteCode
+
+                        #split Logo Code and send
+                        logoByteCodeSplit = [convertByteCode[i:i + 20] for i in range(0, len(convertByteCode), 20)]
+                        for i in logoByteCodeSplit:
+                            logoByteCodeSplitCheckSum = 0
+                            logoByteCodeSplitTemp = [i[j:j + 2] for j in range(0, len(i), 2)]
+                            for item in logoByteCodeSplitTemp:
+                                logoByteCodeSplitCheckSum += int(item,16)
+                            logoByteCodeSplitCheckSum += int('01',16)
+                            logoByteCodeSplitCheckSum += int('03',16)
+                            logoByteCodeSplitCheckSum += (len(i)/2)
+                            logoByteCodeSplitCheckSum %= 256
+                            logoByteCodeSplitCheckSumHex = "{0:0{1}x}".format(logoByteCodeSplitCheckSum, 2)
+                            logoByteCodeSplitSize = len(i)
+                            logoByteCodeSplitSizeHex = "{0:0{1}x}".format(logoByteCodeSplitSize/2, 2)
+                            logoByteCodeSplitPacket = [0x54,0xfe,4+logoByteCodeSplitSize/2,1,3]
+                            logoByteCodeSplitPacketHex = headerPayload+"{0:0{1}x}".format(len(logoByteCodeSplitPacket)+2+(logoByteCodeSplitSize/2), 2)
+                            for k in logoByteCodeSplitPacket:
+                                logoByteCodeSplitPacketHex+="{0:0{1}x}".format(k, 2)
+                            logoByteCodeSplitPacketHex += logoByteCodeSplitSizeHex
+                            logoByteCodeSplitPacketHex += i
+                            logoByteCodeSplitPacketHex += logoByteCodeSplitCheckSumHex
+                            print "Logo code split 86"
+                            print logoByteCodeSplitPacketHex
+                            self.StringToHardwareGatewayQueue.put("SENDCMD " + logoByteCodeSplitPacketHex)
+
+
+                        #RUNLOGO = [0x54, 0xfe, 4, 0, 13, 1, 14]
+                        #Send run logo to serial queue
+                        #setMemPointer = [0x54, 0xfe, 5, 1, 1, 0, 0, 2]
+                        RUNLOGO = [0x54, 0xfe, 4, 0, 13, 1, 14]
+                        RUNLOGOPayloadLength = "{0:0{1}x}".format(len(RUNLOGO), 2)
+                        RUNLOGOPayload = ''
+                        for i in RUNLOGO:
+                            # print type(i)
+                            RUNLOGOPayload += "{0:0{1}x}".format(i, 2)
+                        RUNLOGOBytePacket = headerPayload + RUNLOGOPayloadLength + RUNLOGOPayload
+                        print "Set Logo Chip Memory Pointer"
+                        print RUNLOGOBytePacket
+                        self.StringToHardwareGatewayQueue.put("SENDCMD " + RUNLOGOBytePacket)
+                else:
+                    self.StringToHardwareGatewayQueue.put(string_temp)
+
+                '''
                 if string_split_temp[0] == 'SENDCMD':
                     print "ok"
                     print ast.literal_eval(string_split_temp[7])
@@ -143,8 +239,9 @@ class SerialProcess:
                         payloadTemp_convertToByteCode += chr(i)
                     print len(payloadTemp_convertToByteCode)
                     string_temp = payloadTemp_convertToByteCode
+                '''
 
-            self.StringToHardwareGatewayQueue.put(string_temp)
+            #self.StringToHardwareGatewayQueue.put(string_temp)
         else:
             print "TOO MUCH PARAMETERS"
 

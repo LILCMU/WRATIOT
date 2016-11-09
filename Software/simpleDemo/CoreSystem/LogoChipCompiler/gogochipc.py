@@ -970,7 +970,9 @@ class tinkerParser:
     def __init__(self, procedurs_dict, ordered_procedures_list, network_device_list):
         self.lexer = tinkerGoGoLex(procedurs_dict)
         self.tokens = self.lexer.tokens
-        self.parser = yacc.yacc(module=self,debug=True)
+        #logoFileDirCurrent = os.path.join(logoFileDirCurrent, "LogoChipCompiler/LogoCode/" + string_split_temp[5])
+        print os.path.dirname(sys.argv[0])+"/LogoChipCompiler"
+        self.parser = yacc.yacc(module=self,debug=True,outputdir=os.path.dirname(sys.argv[0]))
         self.procedures_dict = procedurs_dict
         self.ordered_procedures_list = ordered_procedures_list
         self.network_device_list = network_device_list
