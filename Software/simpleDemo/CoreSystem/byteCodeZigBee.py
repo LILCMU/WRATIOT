@@ -143,6 +143,11 @@ class ByteCodeZigBee:
                         packet_temp['IR_MANUAL_OFF_COUNTER'] = ord(bc[13])
                         packet_temp['IR_HOUSEKEEPING_ON_COUNTER'] = ord(bc[14])
                         packet_temp['IR_HOUSEKEEPING_OFF_COUNTER'] = ord(bc[15])
+                        packet_temp['CURRENT_SENSOR'] = struct.unpack('>I', bytearray([0, 0, ord(bc[16]), ord(bc[17])]))[0]
+                        if packet_temp['CURRENT_SENSOR'] > 50:
+                            packet_temp['POWER_CONSUMPTION_FLAG'] = 1
+                        else:
+                            packet_temp['POWER_CONSUMPTION_FLAG'] = 0
 
 
         else:

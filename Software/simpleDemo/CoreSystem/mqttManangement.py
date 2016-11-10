@@ -336,6 +336,33 @@ class MqttMananagement:
                             self.serialProcessIns.SendStringToHardwareGateway(sp_message)
                         else:
                             print "consumeQueue : no event topic match"
+
+                    # normally report, it does not send any serial command back after getting this report.
+                    else:
+                        if len([d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if
+                                str(d['CMDNAME']) == 'REPORTRAW' \
+                                        and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp['SRC_ADDR'] \
+                                        and d['CLUSTERID'] == json_temp['CLUSTER_ID']]) > 0:
+                            # find tuple
+                            tuple_temp = [d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if
+                                          str(d['CMDNAME']) == 'REPORTRAW' \
+                                          and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp[
+                                              'SRC_ADDR'] \
+                                          and d['CLUSTERID'] == json_temp['CLUSTER_ID']]
+                            print "consumeQueue : found" + str(tuple_temp)
+                            tuple_temp = tuple_temp[0]
+                            json_string_temp = json.dumps(json_temp)
+                            # print type(self.GatewayConfigIns.MQTT_SERVER_QOS)
+                            self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,
+                                                    self.GatewayConfigIns.MQTT_SERVER_QOS, False)
+                            # send command to clear register
+                            sp_message = "READATTR %d %d %d %d %d" % (
+                            json_temp['EP'], 0, json_temp['SRC_ADDR'], 6, 0)
+                            self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                        else:
+                            print "consumeQueue : no event topic match"
+
+
                 else:
                     print "consumeQueue : no cmd match"
             else:
