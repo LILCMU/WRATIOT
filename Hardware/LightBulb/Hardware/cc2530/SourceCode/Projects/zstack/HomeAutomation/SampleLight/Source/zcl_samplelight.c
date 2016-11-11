@@ -117,6 +117,8 @@
  #include "LILCustomizeCC2530Board.h"
 #endif
 
+#include "stdlib.h"
+
 /*********************************************************************
  * MACROS
  */
@@ -158,6 +160,9 @@ uint8 zclSampleLightSeqNum;
   uint8 LIL_HOPHER_HOLDKEY_COUNTER = 0;
 
 #endif
+  
+uint16 previous_AnalogPowerConsumptionReport = 0;
+uint8 reportTimeRoundCounter = 0;
 
 /*********************************************************************
  * GLOBAL FUNCTIONS
@@ -1972,6 +1977,7 @@ static void reportGekkoRegisterToCoordinator( void ){
   //uint8 attrCount = 1;
   
   uint8 report_Flag = 0;
+  uint16 analogPowerConsumptionReport;
   
   zclReportCmd_t *reportCmdTemp = osal_mem_alloc( sizeof(zclReportCmd_t) + (sizeof( zclReport_t ) * LOGOCHIPREGISTERSIZE) );
   
@@ -2027,6 +2033,32 @@ static void reportGekkoRegisterToCoordinator( void ){
       zclSampleLight_OnOff = LIGHT_OFF;
     }
   }
+  
+ /* ****************************************
+  *    Logic For Power Comsumption Report
+  * ****************************************
+  * register 5 contain high byte for analog , related to Power(Watts)
+  * register 6 contain low byte for analog , related to Power(Watts)
+  * 
+  */
+  analogPowerConsumptionReport = (( (uint16)LogoChipRegister[5] ) << 8) + (uint16)LogoChipRegister[6];
+  
+  char msgg[50];
+  sprintf(msgg,"P : %x %d %d\n",analogPowerConsumptionReport,abs(analogPowerConsumptionReport-previous_AnalogPowerConsumptionReport),reportTimeRoundCounter);
+  debug_str(msgg);
+  if(abs(analogPowerConsumptionReport-previous_AnalogPowerConsumptionReport)>10){
+    report_Flag = 1;
+  }
+  
+  //report round time
+  //Each round is 5 seconds. 5 seconds * reportTimeRoundCounter = time to report.
+  if(reportTimeRoundCounter>=60){
+    report_Flag = 1;
+    reportTimeRoundCounter = 0;
+  }
+  reportTimeRoundCounter++;
+  
+  previous_AnalogPowerConsumptionReport = analogPowerConsumptionReport;
   
   if(report_Flag == 1){
     zcl_SendReportCmd( 8, &addr, 0xFC01 , reportCmdTemp,
