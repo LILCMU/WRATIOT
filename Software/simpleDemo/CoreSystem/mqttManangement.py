@@ -7,6 +7,7 @@ import logging
 import datetime
 import json
 import sys
+import traceback
 
 from simpleDemoConfig import simpleDemoConfig
 
@@ -309,59 +310,63 @@ class MqttMananagement:
 
                 elif json_temp['CMD'] == 9:
                     #print "consume report"
-                    if json_temp['IR_MANUAL_OFF_COUNTER'] > 0 or json_temp['IR_MANUAL_ON_COUNTER'] > 0 or json_temp['IR_HOUSEKEEPING_OFF_COUNTER'] > 0 or json_temp['IR_HOUSEKEEPING_ON_COUNTER'] > 0:
-                        #print "ir more"
-                        if len([d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if str(d['CMDNAME']) == 'REPORTRAW' \
-                                        and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp['SRC_ADDR'] \
-                                        and d['CLUSTERID'] == json_temp['CLUSTER_ID']]) > 0:
-                            # find tuple
-                            tuple_temp = [d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if str(d['CMDNAME']) == 'REPORTRAW' \
-                                          and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp['SRC_ADDR'] \
-                                          and d['CLUSTERID'] == json_temp['CLUSTER_ID']]
-                            print "consumeQueue : found" + str(tuple_temp)
-                            tuple_temp = tuple_temp[0]
-                            json_string_temp = json.dumps(json_temp)
-                            #print type(self.GatewayConfigIns.MQTT_SERVER_QOS)
-                            self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp, self.GatewayConfigIns.MQTT_SERVER_QOS, False)
-                            #send command to clear register
-                            sp_message = "WREGGEKKO %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 1, 0)
-                            self.serialProcessIns.SendStringToHardwareGateway(sp_message)
-                            sp_message = "WREGGEKKO %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 2, 0)
-                            self.serialProcessIns.SendStringToHardwareGateway(sp_message)
-                            sp_message = "WREGGEKKO %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 3, 0)
-                            self.serialProcessIns.SendStringToHardwareGateway(sp_message)
-                            sp_message = "WREGGEKKO %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 4, 0)
-                            self.serialProcessIns.SendStringToHardwareGateway(sp_message)
-                            sp_message = "READATTR %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 6, 0)
-                            self.serialProcessIns.SendStringToHardwareGateway(sp_message)
-                        else:
-                            print "consumeQueue : no event topic match"
+                    try:
+                        if json_temp['LOGO_PACKET_TYPE'] == 11:
+                            if json_temp['IR_MANUAL_OFF_COUNTER'] > 0 or json_temp['IR_MANUAL_ON_COUNTER'] > 0 or json_temp['IR_HOUSEKEEPING_OFF_COUNTER'] > 0 or json_temp['IR_HOUSEKEEPING_ON_COUNTER'] > 0:
+                                #print "ir more"
+                                if len([d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if str(d['CMDNAME']) == 'REPORTRAW' \
+                                                and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp['SRC_ADDR'] \
+                                                and d['CLUSTERID'] == json_temp['CLUSTER_ID']]) > 0:
+                                    # find tuple
+                                    tuple_temp = [d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if str(d['CMDNAME']) == 'REPORTRAW' \
+                                                  and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp['SRC_ADDR'] \
+                                                  and d['CLUSTERID'] == json_temp['CLUSTER_ID']]
+                                    print "consumeQueue : found" + str(tuple_temp)
+                                    tuple_temp = tuple_temp[0]
+                                    json_string_temp = json.dumps(json_temp)
+                                    #print type(self.GatewayConfigIns.MQTT_SERVER_QOS)
+                                    self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp, self.GatewayConfigIns.MQTT_SERVER_QOS, False)
+                                    #send command to clear register
+                                    sp_message = "WREGGEKKO %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 1, 0)
+                                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                                    sp_message = "WREGGEKKO %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 2, 0)
+                                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                                    sp_message = "WREGGEKKO %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 3, 0)
+                                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                                    sp_message = "WREGGEKKO %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 4, 0)
+                                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                                    sp_message = "READATTR %d %d %d %d %d" % (json_temp['EP'], 0, json_temp['SRC_ADDR'], 6, 0)
+                                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                                else:
+                                    print "consumeQueue : no event topic match"
 
-                    # normally report, it does not send any serial command back after getting this report.
-                    else:
-                        if len([d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if
-                                str(d['CMDNAME']) == 'REPORTRAW' \
-                                        and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp['SRC_ADDR'] \
-                                        and d['CLUSTERID'] == json_temp['CLUSTER_ID']]) > 0:
-                            # find tuple
-                            tuple_temp = [d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if
-                                          str(d['CMDNAME']) == 'REPORTRAW' \
-                                          and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp[
-                                              'SRC_ADDR'] \
-                                          and d['CLUSTERID'] == json_temp['CLUSTER_ID']]
-                            print "consumeQueue : found" + str(tuple_temp)
-                            tuple_temp = tuple_temp[0]
-                            json_string_temp = json.dumps(json_temp)
-                            # print type(self.GatewayConfigIns.MQTT_SERVER_QOS)
-                            self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,
-                                                    self.GatewayConfigIns.MQTT_SERVER_QOS, False)
-                            # send command to clear register
-                            sp_message = "READATTR %d %d %d %d %d" % (
-                            json_temp['EP'], 0, json_temp['SRC_ADDR'], 6, 0)
-                            self.serialProcessIns.SendStringToHardwareGateway(sp_message)
-                        else:
-                            print "consumeQueue : no event topic match"
-
+                            # normally report, it does not send any serial command back after getting this report.
+                            else:
+                                if len([d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if
+                                        str(d['CMDNAME']) == 'REPORTRAW' \
+                                                and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp['SRC_ADDR'] \
+                                                and d['CLUSTERID'] == json_temp['CLUSTER_ID']]) > 0:
+                                    # find tuple
+                                    tuple_temp = [d for d in self.GatewayConfigIns.EVENT_REPORT_TOPIC_LIST if
+                                                  str(d['CMDNAME']) == 'REPORTRAW' \
+                                                  and d['EP'] == json_temp['EP'] and d['SRCADDR'] == json_temp[
+                                                      'SRC_ADDR'] \
+                                                  and d['CLUSTERID'] == json_temp['CLUSTER_ID']]
+                                    print "consumeQueue : found" + str(tuple_temp)
+                                    tuple_temp = tuple_temp[0]
+                                    json_string_temp = json.dumps(json_temp)
+                                    # print type(self.GatewayConfigIns.MQTT_SERVER_QOS)
+                                    self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,
+                                                            self.GatewayConfigIns.MQTT_SERVER_QOS, False)
+                                    # send command to clear register
+                                    sp_message = "READATTR %d %d %d %d %d" % (
+                                    json_temp['EP'], 0, json_temp['SRC_ADDR'], 6, 0)
+                                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                                else:
+                                    print "consumeQueue : no event topic match"
+                    except Exception as e:
+                        print sys.exc_info()[0]
+                        print traceback.format_exc()
 
                 else:
                     print "consumeQueue : no cmd match"
