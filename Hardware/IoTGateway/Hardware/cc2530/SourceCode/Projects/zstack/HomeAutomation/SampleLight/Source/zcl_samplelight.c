@@ -520,6 +520,11 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
     
     HalLedSet (HAL_LED_2, HAL_LED_MODE_TOGGLE);
     osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT, 500 );
+    
+#ifdef WDT_IN_PM1
+    /* If WDT is used, this is a good place to enable it. */
+    WatchDogEnable( WDTIMX );
+#endif
         
     return ( events ^ SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT );
   }
@@ -531,6 +536,11 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
     
     HalLedSet (HAL_LED_1, HAL_LED_MODE_TOGGLE);
     osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT, 500 );
+    
+#ifdef WDT_IN_PM1
+    /* If WDT is used, this is a good place to enable it. */
+    WatchDogEnable( WDTIMX );
+#endif
         
     return ( events ^ SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT );
   }
@@ -1843,7 +1853,7 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
   else if(pMsg->clusterID == Device_annce){
     
     ZDO_DeviceAnnce_t *pDeviceAnnce;
-    char *msgPrint = osal_mem_alloc(128);
+    char *msgPrint = osal_mem_alloc(17);
     
     pDeviceAnnce = osal_mem_alloc(sizeof(ZDO_DeviceAnnce_t));
     ZDO_ParseDeviceAnnce(pMsg,pDeviceAnnce);
@@ -1884,20 +1894,30 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
   else if(pMsg->clusterID == IEEE_addr_rsp){
     
     ZDO_NwkIEEEAddrResp_t *pNwkIEEEAddrResp;
-    char *msgPrint = osal_mem_alloc(128);
+    char *msgPrint;
+    
+    uint8 *SrtAddr;
+    uint8 *Cmd;
     
     pNwkIEEEAddrResp = ZDO_ParseAddrRsp( pMsg );
     if( pNwkIEEEAddrResp->status == ZDO_SUCCESS ){
       
       if( pNwkIEEEAddrResp->numAssocDevs == 0 ){
         
-        sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"STATUS\":0,\"SHORTADDR\":\"0x%x\",\"Type\":0,\"IEEEADDR\":\"%x:%x:%x:%x:%x:%x:%x:%x\"}\r\n", pNwkIEEEAddrResp->nwkAddr, pNwkIEEEAddrResp->extAddr[7], pNwkIEEEAddrResp->extAddr[6], pNwkIEEEAddrResp->extAddr[5], pNwkIEEEAddrResp->extAddr[4], pNwkIEEEAddrResp->extAddr[3], pNwkIEEEAddrResp->extAddr[2], pNwkIEEEAddrResp->extAddr[1], pNwkIEEEAddrResp->extAddr[0]);
-        HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+        
+        SrtAddr = intToByteArray(pNwkIEEEAddrResp->nwkAddr,2);
+        Cmd = intToByteArray(10,2);
+        msgPrint = osal_mem_alloc(16);
+        sprintf(msgPrint, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),10,pNwkIEEEAddrResp->extAddr[7], pNwkIEEEAddrResp->extAddr[6], pNwkIEEEAddrResp->extAddr[5], pNwkIEEEAddrResp->extAddr[4], pNwkIEEEAddrResp->extAddr[3], pNwkIEEEAddrResp->extAddr[2], pNwkIEEEAddrResp->extAddr[1], pNwkIEEEAddrResp->extAddr[0],*SrtAddr,*(SrtAddr+1) );
+        HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, 15);
+        //sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"STATUS\":0,\"SHORTADDR\":\"0x%x\",\"Type\":0,\"IEEEADDR\":\"%x:%x:%x:%x:%x:%x:%x:%x\"}\r\n", pNwkIEEEAddrResp->nwkAddr, pNwkIEEEAddrResp->extAddr[7], pNwkIEEEAddrResp->extAddr[6], pNwkIEEEAddrResp->extAddr[5], pNwkIEEEAddrResp->extAddr[4], pNwkIEEEAddrResp->extAddr[3], pNwkIEEEAddrResp->extAddr[2], pNwkIEEEAddrResp->extAddr[1], pNwkIEEEAddrResp->extAddr[0]);
+        //HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+        
         
       }
       else if( pNwkIEEEAddrResp->numAssocDevs > 0 ){
         
-        
+        msgPrint = osal_mem_alloc(128);
         
         for(uint8 i = 0 ; i < pNwkIEEEAddrResp->numAssocDevs ; i++){
           
@@ -1912,6 +1932,9 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
     
     osal_mem_free( pNwkIEEEAddrResp );
     osal_mem_free(msgPrint);
+    osal_mem_free(SrtAddr);
+    osal_mem_free(Cmd);
+    SerialCommandProcessStatus(1);
   
   }
   else if(pMsg->clusterID == Active_EP_rsp){

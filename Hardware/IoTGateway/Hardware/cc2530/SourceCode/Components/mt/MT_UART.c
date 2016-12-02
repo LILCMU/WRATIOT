@@ -275,6 +275,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
           //sprintf(test,"zdpCmdStatus : %d",zdpCmdStatus);
           //debug_str(test);
           //debug_str(PROCESS_GW_UART_SUCESSS);
+          confirmExecuteFlag = 0;
         }
         
         else if(!strcmp(args[0],"READATTR")){
@@ -609,6 +610,20 @@ void uartHandleCommand( uint8 port, uint8 event ){
                             FALSE , 0, 0, 2, payload_temp );
         
         }
+                             
+        else if(!strcmp(args[0],"BOARDRESET")){
+          
+          uint8 resetType = (uint8)atoi(args[1]);
+          //hard reset using watchdog and disable interrupt.
+          if(resetType == 1){
+            SystemReset();
+          }
+          //soft reset. Reconfiguration and jump to first address.
+          else if(resetType == 2){
+            SystemResetSoft();
+          }
+        
+        }                     
         
         //SerialCommandProcessStatus(1);
         

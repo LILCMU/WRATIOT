@@ -336,6 +336,7 @@
           <state>START_WITH_PERMITJOIN_0</state>
           <state>GEKKO_REPORT</state>
           <state>GEKKO_SEND_CUSTOM_COMMAND</state>
+          <state>WDT_IN_PM1</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
