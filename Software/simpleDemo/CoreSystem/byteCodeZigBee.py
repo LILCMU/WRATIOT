@@ -148,6 +148,14 @@ class ByteCodeZigBee:
                             packet_temp['POWER_CONSUMPTION_FLAG'] = 1
                         else:
                             packet_temp['POWER_CONSUMPTION_FLAG'] = 0
+            elif cmd_pack == 10:
+                packet_temp['CMD'] = 10
+                packet_temp['SRC_ADDR'] = struct.unpack('>I', bytearray([0, 0, ord(bc[13]), ord(bc[14])]))[0]
+                IEEE_ADDR = ''
+                for i in range(5, 13):
+                    IEEE_ADDR += '%02X' % (ord(bc[i]))
+                packet_temp['IEEE_ADDR'] = IEEE_ADDR
+
 
 
         else:

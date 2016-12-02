@@ -158,6 +158,18 @@ class MqttMananagement:
                     self.serialProcessIns.SendStringToHardwareGateway(sp_message)
                 except:
                     print sys.exc_info()
+            elif record_temp['CMDNAME'] == "BOARDRESET":
+                print "SEND BOARD RESET COMMAND"
+                try:
+                    messageTemp = json.loads(msg.payload)
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+                try:
+                    sp_message = "BOARDRESET %d" % ( messageTemp['RESETTYPE'] )
+                    self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                except:
+                    print sys.exc_info()
 
 
                 #send read attribute follow onoff to condfirm value was change.
@@ -186,6 +198,18 @@ class MqttMananagement:
                         print sp_message
                     else:
                         print "NO CMD NAME : IDENTIFYQ"
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
+            elif record_temp['CMDNAME'] == "IEEEREQ":
+                try:
+                    messageTemp = json.loads(msg.payload)
+                    if messageTemp.has_key('CMDNAME'):
+                        sp_message = "IEEEREQ %d %d" % ( 0, messageTemp['ADDR'])
+                        self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                        print sp_message
+                    else:
+                        print "NO CMD NAME : IEEEREQ"
                 except Exception as inst:
                     print "Can not convert msg to json " + msg.topic
                     print inst
@@ -298,6 +322,15 @@ class MqttMananagement:
                         tuple_temp = tuple_temp[0]
                         json_string_temp = json.dumps(json_temp)
                         self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, True)
+
+                elif json_temp['CMD'] == 10:
+                    # Identify Query response
+                    if len([d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'IEEEREQ']) > 0:
+                        # find tuple
+                        tuple_temp = [d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'IEEEREQ']
+                        tuple_temp = tuple_temp[0]
+                        json_string_temp = json.dumps(json_temp)
+                        self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, False)
 
                 elif json_temp['CMD'] == 1:
                     # Device Annou response
