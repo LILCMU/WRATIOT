@@ -155,6 +155,13 @@ class ByteCodeZigBee:
                 for i in range(5, 13):
                     IEEE_ADDR += '%02X' % (ord(bc[i]))
                 packet_temp['IEEE_ADDR'] = IEEE_ADDR
+            elif cmd_pack == 11:
+                packet_temp['CMD'] = 11
+                packet_temp['SRC_ADDR'] = struct.unpack('>I', bytearray([0, 0, ord(bc[13]), ord(bc[14])]))[0]
+                IEEE_ADDR = ''
+                for i in range(5, 13):
+                    IEEE_ADDR += '%02X' % (ord(bc[i]))
+                packet_temp['IEEE_ADDR'] = IEEE_ADDR
 
 
 

@@ -213,6 +213,18 @@ class MqttMananagement:
                 except Exception as inst:
                     print "Can not convert msg to json " + msg.topic
                     print inst
+            elif record_temp['CMDNAME'] == "NWKREQ":
+                try:
+                    messageTemp = json.loads(msg.payload)
+                    if messageTemp.has_key('CMDNAME'):
+                        sp_message = "NWKREQ %s" % (messageTemp['IEEEADDR'].encode('ascii'))
+                        self.serialProcessIns.SendStringToHardwareGateway(sp_message)
+                        print sp_message
+                    else:
+                        print "NO CMD NAME : NWKREQ"
+                except Exception as inst:
+                    print "Can not convert msg to json " + msg.topic
+                    print inst
         #serialProcess.gg()
 
 
@@ -328,6 +340,15 @@ class MqttMananagement:
                     if len([d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'IEEEREQ']) > 0:
                         # find tuple
                         tuple_temp = [d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'IEEEREQ']
+                        tuple_temp = tuple_temp[0]
+                        json_string_temp = json.dumps(json_temp)
+                        self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, False)
+
+                elif json_temp['CMD'] == 11:
+                    # Identify Query response
+                    if len([d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'NWKREQ']) > 0:
+                        # find tuple
+                        tuple_temp = [d for d in self.GatewayConfigIns.COMMAND_AND_RESPONSE_TOPIC_LIST if str(d['CMDNAME']) == 'NWKREQ']
                         tuple_temp = tuple_temp[0]
                         json_string_temp = json.dumps(json_temp)
                         self.MQTTclient.publish(tuple_temp['TOPICRESP'].encode('ascii'), json_string_temp,self.GatewayConfigIns.MQTT_SERVER_QOS, False)
