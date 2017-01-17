@@ -132,6 +132,7 @@ void SerialCommandProcessStatus( uint8 status );
 void GekkoSendCustomCommand( uint8 *contentData );
 #endif
 
+void NWKREQCMD( char *IEEEADDR_temp , uint8 reqType , uint8 index );
 
 /*
  * Initialization

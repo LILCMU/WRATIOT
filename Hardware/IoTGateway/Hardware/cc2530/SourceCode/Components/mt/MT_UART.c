@@ -213,7 +213,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
      //debug_str("rxabfull");
      //break;
    case HAL_UART_RX_TIMEOUT:
-    
+     {
     uint8 confirmExecuteFlag = 1;
     uint8 *bufferInRx;
     uint8 argBuffer[20];
@@ -623,7 +623,40 @@ void uartHandleCommand( uint8 port, uint8 event ){
             SystemResetSoft();
           }
         
-        }                     
+        }
+        
+        else if(!strcmp(args[0],"NWKREQ")){
+          /*
+          uint8 IEEEAddress_arg[8];
+          uint8 index_temp = 0;
+          uint8 index_ieee = 7;
+          char split_arg1[2]; 
+          char split_arg2[2];
+          
+          //char debugStr[50];
+          
+          for(index_temp = 0;index_temp < 16;index_temp+=2){
+            
+            split_arg1[0] = args[1][index_temp];
+            split_arg2[0] = args[1][index_temp+1];
+            IEEEAddress_arg[index_ieee] = (uint8) ( ((uint8)strtoul(split_arg1,NULL,16)<<4) + ((uint8)strtoul(split_arg2,NULL,16)) );
+            index_ieee-=1;
+            
+          }
+          
+          ZDP_NwkAddrReq( IEEEAddress_arg, (uint8)atoi(args[2]) , (uint8)atoi(args[3]) , 0 );
+          //sprintf(debugStr,"D|%d %d %d %d %d %d %d %d| %d | %d |\n",IEEEAddress_arg[0],IEEEAddress_arg[1],IEEEAddress_arg[2],IEEEAddress_arg[3],IEEEAddress_arg[4],IEEEAddress_arg[5],IEEEAddress_arg[6],IEEEAddress_arg[7], (uint8)atoi(args[2]) , (uint8)atoi(args[3]) );
+          //HalUARTWrite(port, debugStr, 50);
+          //debug_str(debugStr);
+          confirmExecuteFlag = 0; 
+          */
+          
+          
+          
+          NWKREQCMD( args[1] , (uint8)atoi(args[2]) , (uint8)atoi(args[3]) );
+          confirmExecuteFlag = 0;
+          
+        }
         
         //SerialCommandProcessStatus(1);
         
@@ -664,7 +697,7 @@ void uartHandleCommand( uint8 port, uint8 event ){
    
   
   
-    break;
+  break; }
   }
   
   
@@ -787,6 +820,32 @@ void testWriteNV( void ){
   
 }
 
+void NWKREQCMD( char *IEEEADDR_temp , uint8 reqType , uint8 index ){
+  
+  uint8 *IEEEADDRESS_Byte;
+  uint8 ieee_index = 7;
+  uint8 ieee_bytecode_index = 0;
+  IEEEADDRESS_Byte = osal_mem_alloc( sizeof(uint8) * 8 );
+  char split_temp1[2];
+  char split_temp2[2];
+  
+  
+  for(ieee_bytecode_index = 0 ; ieee_bytecode_index < 16 ; ieee_bytecode_index+=2 ){
+  
+    split_temp1[0] = IEEEADDR_temp[ieee_bytecode_index];
+    split_temp2[0] = IEEEADDR_temp[ieee_bytecode_index+1];
+    
+    *(IEEEADDRESS_Byte + ieee_index) = (uint8) ( ((uint8)strtoul(split_temp1,NULL,16)<<4) + ((uint8)strtoul(split_temp2,NULL,16)) );
+    ieee_index--;
+      
+  }
+  
+  ZDP_NwkAddrReq( IEEEADDRESS_Byte, reqType , index , 0 );
+  
+  osal_mem_free(IEEEADDRESS_Byte);
+
+}
+
 void SerialCommandProcessStatus( uint8 status ){
   
   char msgStr[7];
@@ -816,7 +875,7 @@ void AddDeviceToCacheDeviceTable( uint16 nwkid ){
   
   uint16 i;
   uint8 existingFlag = 0;
-  char msgStr[7];
+  //char msgStr[7];
   //check existing data
   for( i = 0 ; i < CacheDeviceTablePtr->CacheDeviceTableCount ; i++){
     if( CacheDeviceTablePtr->CacheDevice[i] == nwkid ){

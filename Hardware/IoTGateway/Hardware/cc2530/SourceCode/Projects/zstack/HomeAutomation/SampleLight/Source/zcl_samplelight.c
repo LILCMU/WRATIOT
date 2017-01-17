@@ -368,7 +368,9 @@ void zclSampleLight_Init( byte task_id )
   
   ZDO_RegisterForZDOMsg(task_id, Active_EP_rsp );
   
-  ZDO_RegisterForZDOMsg(task_id, Simple_Desc_rsp ); 
+  ZDO_RegisterForZDOMsg(task_id, Simple_Desc_rsp );
+  
+  ZDO_RegisterForZDOMsg(task_id, NWK_addr_rsp );
 
 
 #if (defined HAL_BOARD_ZLIGHT) || (defined HAL_PWM)
@@ -1603,7 +1605,7 @@ static uint8 zclSampleLight_ProcessInReadRspCmd( zclIncomingMsg_t *pInMsg )
       
       msgPrint = osal_mem_alloc( packetLength+6 );
       
-      sprintf(msgPrint,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),packetLength,*SrtAddr,*(SrtAddr+1), (uint8) pInMsg->srcAddr.endPoint , *ClusterId,*(ClusterId+1) , *AttrId,*(AttrId+1)  , readRspCmd->attrList[0].dataType , *dataLenght_byte_ptr , *(dataLenght_byte_ptr+1) );
+      sprintf(msgPrint,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),packetLength,*SrtAddr,*(SrtAddr+1), (uint8) pInMsg->srcAddr.endPoint , *ClusterId,*(ClusterId+1) , *AttrId,*(AttrId+1)  , readRspCmd->attrList[0].dataType , *dataLenght_byte_ptr , *(dataLenght_byte_ptr+1) );
       if(dataLenght_byte>0){
         memcpy(msgPrint+15,readRspCmd->attrList[0].data,(uint8)dataLenght_byte);
       }
@@ -1885,7 +1887,8 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
     osal_mem_free(SrtAddr);
     osal_mem_free(Cmd);
     
-    AddDeviceToCacheDeviceTable( pDeviceAnnce->nwkAddr );
+    //Add Short Address to Cache Table
+    //AddDeviceToCacheDeviceTable( pDeviceAnnce->nwkAddr );
     
     osal_mem_free( pDeviceAnnce );
     osal_mem_free(msgPrint);
@@ -2057,6 +2060,55 @@ static void zclSampleLight_ProcessZDOMsgs( zdoIncomingMsg_t *pMsg )
     osal_mem_free(AppProId);
     osal_mem_free(temp);
     
+  
+  }
+  else if(pMsg->clusterID == NWK_addr_rsp){
+  
+    ZDO_NwkIEEEAddrResp_t *pNwkIEEEAddrResp;
+    char *msgPrint;
+    
+    uint8 *SrtAddr;
+    uint8 *Cmd;
+    
+    pNwkIEEEAddrResp = ZDO_ParseAddrRsp( pMsg );
+    if( pNwkIEEEAddrResp->status == ZDO_SUCCESS ){
+      
+      if( pNwkIEEEAddrResp->numAssocDevs == 0 ){
+        
+        
+        SrtAddr = intToByteArray(pNwkIEEEAddrResp->nwkAddr,2);
+        Cmd = intToByteArray(11,2);
+        msgPrint = osal_mem_alloc(16);
+        sprintf(msgPrint, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",0x54,0xfe,*Cmd,*(Cmd+1),10,pNwkIEEEAddrResp->extAddr[7], pNwkIEEEAddrResp->extAddr[6], pNwkIEEEAddrResp->extAddr[5], pNwkIEEEAddrResp->extAddr[4], pNwkIEEEAddrResp->extAddr[3], pNwkIEEEAddrResp->extAddr[2], pNwkIEEEAddrResp->extAddr[1], pNwkIEEEAddrResp->extAddr[0],*SrtAddr,*(SrtAddr+1) );
+        HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, 15);
+        //sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"STATUS\":0,\"SHORTADDR\":\"0x%x\",\"Type\":0,\"IEEEADDR\":\"%x:%x:%x:%x:%x:%x:%x:%x\"}\r\n", pNwkIEEEAddrResp->nwkAddr, pNwkIEEEAddrResp->extAddr[7], pNwkIEEEAddrResp->extAddr[6], pNwkIEEEAddrResp->extAddr[5], pNwkIEEEAddrResp->extAddr[4], pNwkIEEEAddrResp->extAddr[3], pNwkIEEEAddrResp->extAddr[2], pNwkIEEEAddrResp->extAddr[1], pNwkIEEEAddrResp->extAddr[0]);
+        //HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+        
+        
+      }
+      /*
+      else if( pNwkIEEEAddrResp->numAssocDevs > 0 ){
+        
+        msgPrint = osal_mem_alloc(128);
+        
+        for(uint8 i = 0 ; i < pNwkIEEEAddrResp->numAssocDevs ; i++){
+          
+          //sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"STATUS\":0,\"SRTADDR\":\"0x%x\",\"Type\":1,\"STID\":\"0x%x\",\"NumAsso\":\"0x%x\",\"TB\":\"0x%x\"}\r\n", pNwkIEEEAddrResp->nwkAddr, pNwkIEEEAddrResp->startIndex, pNwkIEEEAddrResp->numAssocDevs, pNwkIEEEAddrResp->devList[i]);
+          sprintf(msgPrint, "CMD{\"CMD\":\"IEEEREQ\",\"SRTADDR\":\"0x%x\",\"TB\":\"0x%x\"}\r\n",pNwkIEEEAddrResp->nwkAddr,pNwkIEEEAddrResp->devList[i]);
+          HalUARTWrite(MT_UART_DEFAULT_PORT, msgPrint, strlen(msgPrint));
+          
+        }
+        
+      }
+      */
+      
+    }
+    
+    osal_mem_free( pNwkIEEEAddrResp );
+    osal_mem_free(msgPrint);
+    osal_mem_free(SrtAddr);
+    osal_mem_free(Cmd);
+    SerialCommandProcessStatus(1);
   
   }
   
