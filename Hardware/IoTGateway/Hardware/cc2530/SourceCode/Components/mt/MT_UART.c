@@ -583,7 +583,9 @@ void uartHandleCommand( uint8 port, uint8 event ){
           osal_mem_free(reportCmdTemp);
           
         }
-        
+        // *************************************************
+        // This is a custom command outside of the ZigBee standard
+        // Write Register Gekko
         else if(!strcmp(args[0],"WREGGEKKO")){
           
           afAddrType_t addr;
@@ -605,10 +607,14 @@ void uartHandleCommand( uint8 port, uint8 event ){
             }
           addr.addr.shortAddr = (uint16)atoi(args[3]);
           
+          // 0x50 is the command ID, which was randomly picked. 
+          // ZigBee only defines commands 1,2,3 for on,off,toggle
+          // so 0x50 is our own command.
+          
           zcl_SendCommand( 8 , &addr , ZCL_CLUSTER_ID_GEN_ON_OFF,
                             0x50, TRUE, ZCL_FRAME_CLIENT_SERVER_DIR,
                             FALSE , 0, 0, 2, payload_temp );
-        
+          // max payload len is unknown but 50 is assured from our experiment.
         }
                              
         else if(!strcmp(args[0],"BOARDRESET")){
