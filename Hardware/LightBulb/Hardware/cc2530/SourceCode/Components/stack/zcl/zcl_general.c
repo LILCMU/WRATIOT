@@ -3129,8 +3129,10 @@ static ZStatus_t zclGeneral_ProcessInOnOff( zclIncoming_t *pInMsg,
 
 #ifdef ZIGBEE_WRITE_REGISTER_GEKKO
     case COMMAND_ZIGBEE_WRITE_REGISTER_GEKKO:
+      // make sure the call back is not NULL 
       if ( pCBs->pfnOnOff_ZigBee_Write_Register_Gekko )
       {
+        // call the callback
         pCBs->pfnOnOff_ZigBee_Write_Register_Gekko( pInMsg->hdr.commandID );
       }
       break;
