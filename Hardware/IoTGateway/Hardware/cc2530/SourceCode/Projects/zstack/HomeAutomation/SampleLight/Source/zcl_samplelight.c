@@ -1686,6 +1686,10 @@ static uint8 zclSampleLight_ProcessInReportCmd( zclIncomingMsg_t *pInMsg ){
 #ifdef GEKKO_REPORT
   case ZCL_CLUSTER_ID_LIL_GEKKO:
     {
+      
+      // ************************
+      // sends the report over the serial port (to Python).
+      
       char msgStr[44];
       //sprintf(msgStr,"rp %d %d %d %d %d %x %x",pInMsg->endPoint,reportRsp->numAttr,*(reportRsp->attrList[0].attrData),*(reportRsp->attrList[1].attrData),*(reportRsp->attrList[2].attrData),pInMsg->srcAddr.addr.shortAddr,pInMsg->clusterId);
       //debug_str(msgStr);
@@ -1708,7 +1712,11 @@ static uint8 zclSampleLight_ProcessInReportCmd( zclIncomingMsg_t *pInMsg ){
         
       }
       
+      // print to the serial port
+      // *make sure the data is zero terminated.
       HalUARTWrite(MT_UART_DEFAULT_PORT, msgStr, 43);
+      
+      // free the memory allocated by intoByteArray();
       osal_mem_free(SrtAddr);
       osal_mem_free(Cmd);
       osal_mem_free(ClusterId);
