@@ -2002,9 +2002,9 @@ static void reportGekkoRegisterToCoordinator( void ){
   reportCmdTemp->numAttr = 32;
   
   
-  addr.endPoint = (uint8)8;
-  addr.addrMode = (afAddrMode_t)Addr16Bit;
-  addr.addr.shortAddr = (uint16)0;
+  addr.endPoint = (uint8)8;         // the destination end point number, must match with the receiving device
+  addr.addrMode = (afAddrMode_t)Addr16Bit; 
+  addr.addr.shortAddr = (uint16)0;  // zero means we send back to the coordinator
   
   for( uint8 i = 0; i <  LOGOCHIPREGISTERSIZE ; i++){
   
@@ -2024,6 +2024,9 @@ static void reportGekkoRegisterToCoordinator( void ){
    * register 3 is IR Housekeeping on counter.
    * register 4 is IR Housekeeping complete counter.
    */
+  
+  // if a remote has been pressed, we update the ONOFF attribute value and 
+  // trigger a flag that causes the node to send a report to the coordinator.
   if(LogoChipRegister[1]!=0 || LogoChipRegister[2]!=0 || LogoChipRegister[3]!=0 || LogoChipRegister[4]!=0){
     report_Flag = 1;
     //please consider priority of remote and web app
@@ -2046,12 +2049,17 @@ static void reportGekkoRegisterToCoordinator( void ){
   //char msgg[50];
   //sprintf(msgg,"P : %x %d %d\n",analogPowerConsumptionReport,abs(analogPowerConsumptionReport-previous_AnalogPowerConsumptionReport),reportTimeRoundCounter);
   //debug_str(msgg);
+  // send only if the delta is higher than the threshold
   if(abs(analogPowerConsumptionReport-previous_AnalogPowerConsumptionReport)>10){
     report_Flag = 1;
   }
   
-  //report round time
-  //Each round is 5 seconds. 5 seconds * reportTimeRoundCounter = time to report.
+  // ************************
+  // Keep alive report
+  // The node will send an update report to the coordinator when a timeout is 
+  // reached even if there is no significant changed in the data.
+  
+  // The keep alive time is 5 seconds * reportTimeRoundCounter = time to report.
   if(reportTimeRoundCounter>=60){
     report_Flag = 1;
     reportTimeRoundCounter = 0;
@@ -2061,6 +2069,7 @@ static void reportGekkoRegisterToCoordinator( void ){
   previous_AnalogPowerConsumptionReport = analogPowerConsumptionReport;
   
   if(report_Flag == 1){
+    // send the report
     zcl_SendReportCmd( 8, &addr, 0xFC01 , reportCmdTemp,
                       ZCL_FRAME_CLIENT_SERVER_DIR , FALSE, 0 );
     report_Flag = 0;
