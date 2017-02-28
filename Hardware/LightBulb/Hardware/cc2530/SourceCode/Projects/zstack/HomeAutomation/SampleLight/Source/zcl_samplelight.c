@@ -2043,9 +2043,9 @@ static void reportGekkoRegisterToCoordinator( void ){
   */
   analogPowerConsumptionReport = (( (uint16)LogoChipRegister[5] ) << 8) + (uint16)LogoChipRegister[6];
   
-  char msgg[50];
-  sprintf(msgg,"P : %x %d %d\n",analogPowerConsumptionReport,abs(analogPowerConsumptionReport-previous_AnalogPowerConsumptionReport),reportTimeRoundCounter);
-  debug_str(msgg);
+  //char msgg[50];
+  //sprintf(msgg,"P : %x %d %d\n",analogPowerConsumptionReport,abs(analogPowerConsumptionReport-previous_AnalogPowerConsumptionReport),reportTimeRoundCounter);
+  //debug_str(msgg);
   if(abs(analogPowerConsumptionReport-previous_AnalogPowerConsumptionReport)>10){
     report_Flag = 1;
   }
