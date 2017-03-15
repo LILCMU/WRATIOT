@@ -1,5 +1,5 @@
-
-
 .idea/
-simpleDemoConfig/
-CONFIG_GATEWAY.csv
+simpleDemoConfig/*.zip
+#CONFIG_GATEWAY.csv
+CONFIG_GATEWAY_PRODUCTION.csv
+*.pyc
