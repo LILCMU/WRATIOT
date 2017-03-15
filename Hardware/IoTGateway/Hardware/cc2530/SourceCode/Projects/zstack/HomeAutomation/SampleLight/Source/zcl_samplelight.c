@@ -543,7 +543,15 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
     /* If WDT is used, this is a good place to enable it. */
     WatchDogEnable( WDTIMX );
 #endif
-        
+
+#ifdef RESET_GW_WITH_GPIO
+
+    if( HAL_PUSH_BUTTON2() == 0 ){
+      SystemReset();
+    }
+    
+#endif    
+    
     return ( events ^ SAMPLELIGHT_HEARTBEAT_TOGGLELED_EVT );
   }
 #endif

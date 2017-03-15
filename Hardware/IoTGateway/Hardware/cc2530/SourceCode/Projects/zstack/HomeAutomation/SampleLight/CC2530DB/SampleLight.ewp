@@ -337,6 +337,7 @@
           <state>GEKKO_REPORT</state>
           <state>GEKKO_SEND_CUSTOM_COMMAND</state>
           <state>WDT_IN_PM1</state>
+          <state>RESET_GW_WITH_GPIO</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
