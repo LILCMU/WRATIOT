@@ -2030,11 +2030,17 @@ static void reportGekkoRegisterToCoordinator( void ){
   if(LogoChipRegister[1]!=0 || LogoChipRegister[2]!=0 || LogoChipRegister[3]!=0 || LogoChipRegister[4]!=0){
     report_Flag = 1;
     //please consider priority of remote and web app
-    if(LogoChipRegister[20]==0x0a){
-      zclSampleLight_OnOff = LIGHT_ON;
-    }else if(LogoChipRegister[20]==0x00){
-      zclSampleLight_OnOff = LIGHT_OFF;
-    }
+    //if(LogoChipRegister[20]==0x0a){
+    //  zclSampleLight_OnOff = LIGHT_ON;
+    //}else if(LogoChipRegister[20]==0x00){
+    //  zclSampleLight_OnOff = LIGHT_OFF;
+    //}
+  }
+  
+  if(LogoChipRegister[20]==0x0a){
+    zclSampleLight_OnOff = LIGHT_ON;
+  }else if(LogoChipRegister[20]==0x00){
+    zclSampleLight_OnOff = LIGHT_OFF;
   }
   
  /* ****************************************
