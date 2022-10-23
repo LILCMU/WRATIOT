@@ -1,10 +1,10 @@
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\8051\bin\8051proc.dll" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\8051\bin\8051proc.dll" 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\8051\bin\8051emu_cc.dll" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\8051\bin\8051emu_cc.dll" 
 
-"H:\WRAT\Project\IotProject\Hardware\LightBulb\Hardware\cc2530\SourceCode\Projects\zstack\HomeAutomation\SampleLight\CC2530DB\RouterEB\Exe\SampleLight.d51" 
+"C:\Users\arnan.s\Documents\gekko_firmware.github\Hardware\LightBulb\Hardware\cc2530\SourceCode\Projects\zstack\HomeAutomation\SampleLight\CC2530DB\RouterEB\Exe\SampleLight 50K.hex" 
 
---plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\8051\bin\8051bat.dll" 
+--plugin="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\8051\bin\8051bat.dll" 
 
 
 

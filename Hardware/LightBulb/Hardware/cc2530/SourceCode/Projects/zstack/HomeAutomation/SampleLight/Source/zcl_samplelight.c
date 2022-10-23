@@ -136,6 +136,8 @@
 #define PWM_FULL_DUTY_CYCLE       100
 #endif
 
+#define GEKKO_REPORT_INTERVAL     60000 // report interval in ms
+
 /*********************************************************************
  * TYPEDEFS
  */
@@ -444,7 +446,7 @@ void zclSampleLight_Init( byte task_id )
 #endif
   
 #if defined(ZCL_REPORT) && defined(GEKKO_REPORT)
-  osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 5000 );
+  osal_start_timerEx( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, GEKKO_REPORT_INTERVAL );
 #endif
   
 #if defined(ZCL_REPORT) && defined(LOCALIZATION_NODE_REPORT)
@@ -658,7 +660,7 @@ uint16 zclSampleLight_event_loop( uint8 task_id, uint16 events )
    
     reportGekkoRegisterToCoordinator();
     
-    osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, 5000 );
+    osal_start_reload_timer( zclSampleLight_TaskID, SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT, GEKKO_REPORT_INTERVAL );
     return ( events ^ SAMPLELIGHT_GEKKO_REPORT_REGISTER_EVT );
   }
 #endif
