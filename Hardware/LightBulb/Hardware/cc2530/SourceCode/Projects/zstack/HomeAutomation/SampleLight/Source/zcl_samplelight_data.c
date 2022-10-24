@@ -90,6 +90,7 @@ const uint8 zclSampleLight_HWRevision = SAMPLELIGHT_HWVERSION;
 const uint8 zclSampleLight_ZCLVersion = SAMPLELIGHT_ZCLVERSION;
 const uint8 zclSampleLight_ManufacturerName[] = { 16, 'T','e','x','a','s','I','n','s','t','r','u','m','e','n','t','s' };
 const uint8 zclSampleLight_ModelId[] = { 16, 'T','I','0','0','0','1',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ' };
+//const uint8 zclSampleLight_ModelId[] = { 16, 'W','R','A','T','0','1',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ' };
 const uint8 zclSampleLight_DateCode[] = { 16, '2','0','0','6','0','8','3','1',' ',' ',' ',' ',' ',' ',' ',' ' };
 const uint8 zclSampleLight_PowerSource = POWER_SOURCE_MAINS_1_PHASE;
 
